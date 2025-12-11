@@ -1,35 +1,32 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
-import {
-  Outlet,
-  RouterProvider,
-  createRootRoute,
-  createRoute,
-  createRouter,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { RouterProvider, createRouter } from '@tanstack/react-router'
 
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
 
-import App from './App.tsx'
+import { rootRoute } from './routes/__root.tsx'
+import { indexRoute } from './routes/index.tsx'
+import { pokemonIdRoute } from './routes/pokemonId.tsx'
+import { pokedexRoute } from './routes/pokedex.tsx'
+import { compareRoute } from './routes/compare.tsx'
+import { favoritesRoute } from './routes/favorites.tsx'
+import { teamsRoute } from './routes/teams.tsx'
+import { dashboardRoute } from './routes/dashbaord.tsx'
+import { profilePageRoute } from './routes/profile-page.tsx'
+import { loginRoute } from './routes/login.tsx'
 
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  ),
-})
-
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/',
-  component: App,
-})
-
-const routeTree = rootRoute.addChildren([indexRoute])
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  pokemonIdRoute,
+  pokedexRoute,
+  compareRoute,
+  favoritesRoute,
+  teamsRoute,
+  dashboardRoute,
+  profilePageRoute,
+  loginRoute,
+])
 
 const router = createRouter({
   routeTree,

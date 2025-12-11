@@ -1,0 +1,21 @@
+import { createRoute, redirect } from '@tanstack/react-router'
+import { rootRoute } from './__root'
+import Teams from '@/pages/teams'
+import { useAuth } from '@/stores/auth'
+
+export const teamsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'teams',
+
+  beforeLoad: () => {
+    const user = useAuth.getState().user
+    if (!user) {
+      throw redirect({
+        to: '/login',
+        search: { redirect: location.href || '/' },
+      })
+    }
+  },
+
+  component: Teams,
+})

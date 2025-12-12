@@ -2,7 +2,8 @@ import { pokemonIdRoute } from '@/routes/pokemonId'
 
 function PokemonDetails() {
   const { pokemonId } = pokemonIdRoute.useParams()
-  return <div>{pokemonId}</div>
+  const convertId = Number(pokemonId)
+  return <div>{convertId}</div>
 }
 
 export default PokemonDetails

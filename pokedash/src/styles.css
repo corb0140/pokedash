@@ -51,9 +51,25 @@
   button {
     @apply outline-none cursor-pointer;
   }
+
+  input {
+    @apply outline-0 border-0;
+  }
 }
 
 @layer utilities {
+  @keyframes rotate360 {
+    0% {
+      transform: rotate(0);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-loader {
+    animation: rotate360 1s linear infinite;
+  }
 }
 
 @layer components {

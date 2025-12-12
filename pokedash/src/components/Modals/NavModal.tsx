@@ -1,3 +1,4 @@
+// import { Icon } from '@iconify-icon/react' {link.icon && <Icon icon={link.icon} />}
 import { Link } from '@tanstack/react-router'
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
@@ -17,7 +18,7 @@ function NavModal({ onClose }: { onClose: () => void }) {
       {
         x: 0,
         opacity: 1,
-        duration: 1,
+        duration: 0.5,
         ease: 'power1.inOut',
       },
     )
@@ -30,7 +31,7 @@ function NavModal({ onClose }: { onClose: () => void }) {
         opacity: 1,
         stagger: 0.1,
         duration: 0.8,
-        delay: 1,
+        delay: 0.5,
         ease: 'power2.out',
       },
     )
@@ -49,7 +50,7 @@ function NavModal({ onClose }: { onClose: () => void }) {
   return (
     <div
       ref={containerRef}
-      className="fixed top-0 p-5 right-0 min-h-screen w-1/2 bg-info-bg flex justify-center"
+      className="fixed top-0 p-5 right-0 min-h-screen w-1/2 bg-info-bg flex justify-center z-10"
     >
       <span onClick={handleClose} className="absolute top-5 right-5 text-lg">
         {closeText.map((letter, index) => (
@@ -73,7 +74,7 @@ function NavModal({ onClose }: { onClose: () => void }) {
             </Link>
           ) : (
             <div key={index} className="mt-auto flex">
-              {user ? (
+              {!user ? (
                 <Link to={link.path} onClick={handleClose}>
                   {link.name}
                 </Link>

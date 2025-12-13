@@ -8,6 +8,15 @@
   --color-link: hsl(0, 0%, 50%);
   --color-info-bg: hsl(220, 50%, 98%);
   --color-info-text: hsl(215, 56%, 14%);
+  --color-ability-border: hsl(342, 24%, 68%);
+
+  /* STATS */
+  --color-hp: hsl(349, 74%, 50%);
+  --color-attack: hsl(26, 100%, 64%);
+  --color-defense: hsl(47, 100%, 65%);
+  --color-special-attack: hsl(196, 98%, 76%);
+  --color-special-defense: hsl(99, 78%, 73%);
+  --color-speed: hsl(348, 100%, 78%);
 
   /* POKEMON TYPE COLORS */
   --color-type-normal: hsl(45, 20%, 75%);
@@ -69,6 +78,14 @@
 
   .animate-loader {
     animation: rotate360 1s linear infinite;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
 

@@ -4,5 +4,8 @@ export const ApiConstants = {
 
 export const ApiEndpoints = {
   ALL_POKEMON: 'pokemon?limit=10000&offset=0',
-  GET_POKEMON_BY_ORDER_NUMBER: (id: number) => `pokemon/${id}`,
+  GET_POKEMON_BY_ID: (id: number) => `pokemon/${id}`,
+  GET_POKEMON_SPECIES_BY_ID: (id: number) => `pokemon-species/${id}`,
+  GET_POKEMON_TYPE_DATA: (type: string) =>
+    `https://pokeapi.co/api/v2/type/${type}`,
 }

@@ -12,7 +12,7 @@ import {
 } from '@/services/pokeAPI'
 
 export type PokemonDetailModalProps = PokemonProps & {
-  onClose: () => void
+  onClose?: () => void
 }
 
 export default function PokemonDetailModal({
@@ -31,7 +31,7 @@ export default function PokemonDetailModal({
   const [description, setDescription] = useState<string>('')
   const [types, setTypes] = useState<Array<string>>([])
   const [abilities, setAbilities] = useState<Array<string>>([])
-  const [currentId, setCurrentId] = useState<number | undefined>(id)
+  const [currentId, setCurrentId] = useState<number | number>(id || 1)
   const [prevPokemon, setPrevPokemon] = useState<{
     name: string
     image: string
@@ -214,7 +214,7 @@ export default function PokemonDetailModal({
     }
 
     fetchData()
-  }, [currentId])
+  }, [currentId, id])
 
   const handlePrev = () => {
     if (!currentId) return
@@ -226,13 +226,22 @@ export default function PokemonDetailModal({
     if (currentId < 1350) setCurrentId(currentId + 1)
   }
 
+  //   RERENDER ON LARGE SCREENS
+  useEffect(() => {
+    if (!id) return
+    setCurrentId(id)
+  }, [id])
+
   return (
     <div
       ref={containerRef}
-      className="fixed h-[95vh] w-full bottom-0 left-0 bg-white overflow-y-scroll no-scrollbar rounded-t-2xl py-6 px-5 shadow-[-2px_0_10px_rgba(0,0,0,0.1)]"
+      className={` fixed lg:relative h-[95vh] lg:h-[84vh] w-full bottom-0 left-0 bg-white overflow-y-scroll no-scrollbar rounded-t-2xl lg:rounded-b-2xl py-6 px-5 shadow-[-2px_0_10px_rgba(0,0,0,0.1)]`}
     >
       {/* CLOSE BUTTON */}
-      <span onClick={handleClose} className="sticky top-5 left-100 text-lg">
+      <span
+        onClick={handleClose}
+        className="sticky top-5 left-100 text-lg lg:hidden"
+      >
         {closeText.map((letter, index) => (
           <span
             key={`${letter}-${index}`}
@@ -247,7 +256,7 @@ export default function PokemonDetailModal({
       </span>
 
       {/* IMAGE */}
-      <div className="h-40 w-full mt-15 mb-5">
+      <div className="h-40 w-full mt-15 lg:mt-5 mb-5">
         <img
           src={image || undefined}
           alt={name}
@@ -267,7 +276,7 @@ export default function PokemonDetailModal({
           {types.map((t) => (
             <span
               key={t}
-              className={`px-4 py-1.5 rounded-lg text-white uppercase font-bold text-[12px] ${TYPE_COLORS[t]}`}
+              className={`p-2 rounded-lg text-white uppercase font-bold text-[12px] ${TYPE_COLORS[t]}`}
             >
               {t}
             </span>
@@ -275,7 +284,7 @@ export default function PokemonDetailModal({
         </div>
 
         {/* DESCRIPTION */}
-        <p>{description}</p>
+        <p className="text-center">{description}</p>
       </div>
 
       {/* ABILITIES */}
@@ -385,11 +394,11 @@ export default function PokemonDetailModal({
       </div>
 
       {/* PREVIOUS & NEXT */}
-      <div className="mt-8 flex items-center justify-between h-20 w-full gap-3 bg-page-background rounded-lg">
+      <div className="mt-8 flex items-center justify-center h-20 w-full gap-6 bg-page-background rounded-lg">
         <button
           onClick={handlePrev}
           disabled={!prevPokemon}
-          className="flex items-center gap-2 text-info-text rounded-lg disabled:opacity-50 grow"
+          className="flex items-center gap-2 text-info-text rounded-lg disabled:opacity-50"
         >
           {prevPokemon && <ChevronLeft className="h-5 w-5" />}
 
@@ -415,7 +424,7 @@ export default function PokemonDetailModal({
         <button
           onClick={handleNext}
           disabled={!nextPokemon}
-          className="flex items-center gap-2 text-info-text rounded-lg disabled:opacity-50 grow"
+          className="flex items-center gap-2 text-info-text rounded-lg disabled:opacity-50"
         >
           {nextPokemon && (
             <>
@@ -428,7 +437,7 @@ export default function PokemonDetailModal({
               <img
                 src={nextPokemon.image}
                 alt={nextPokemon.name}
-                className="h-8 w-8 object-contain"
+                className="h-5 w-5 object-contain"
               />
             </>
           )}

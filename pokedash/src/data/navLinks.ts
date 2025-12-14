@@ -29,8 +29,4 @@ export const navLinks = [
     path: '/dashboard',
     icon: 'arcticons:pokemon-tcg-live',
   },
-  {
-    name: 'Login',
-    path: '/login',
-  },
 ]

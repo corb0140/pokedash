@@ -67,27 +67,25 @@ function NavModal({ onClose }: { onClose: () => void }) {
       </span>
 
       <div className="flex flex-col gap-4 p-2 items-center mt-30">
-        {navLinks.map((link, index) => {
-          return link.name !== 'Login' ? (
-            <Link key={index} to={link.path} onClick={handleClose}>
-              {link.name}
+        {navLinks.map((link, index) => (
+          <Link key={index} to={link.path} onClick={handleClose}>
+            {link.name}
+          </Link>
+        ))}
+
+        <div className="mt-auto flex">
+          {!user ? (
+            <Link to="/login" onClick={handleClose}>
+              Login
             </Link>
           ) : (
-            <div key={index} className="mt-auto flex">
-              {!user ? (
-                <Link to={link.path} onClick={handleClose}>
-                  {link.name}
-                </Link>
-              ) : (
-                <Link
-                  to="/profile-page"
-                  onClick={handleClose}
-                  className="h-20 w-20 overflow-hidden rounded-full border border-link"
-                />
-              )}
-            </div>
-          )
-        })}
+            <Link
+              to="/profile-page"
+              onClick={handleClose}
+              className="h-20 w-20 overflow-hidden rounded-full border border-link"
+            />
+          )}
+        </div>
       </div>
     </div>
   )

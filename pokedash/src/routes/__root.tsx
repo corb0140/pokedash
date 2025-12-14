@@ -32,11 +32,11 @@ export const rootRoute = createRootRoute({
         </svg>
       </div>
 
-      <header className="relative z-20">
+      <header className="relative">
         <Navbar />
       </header>
 
-      <main className="relative z-20">
+      <main className="relative">
         <Outlet />
       </main>
 

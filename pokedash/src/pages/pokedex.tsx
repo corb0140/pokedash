@@ -1,5 +1,5 @@
 import { Icon } from '@iconify/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import { usePokemonData } from '@/queries/getPokemonQuery'
 import PokemonDetailModal from '@/components/Modals/PokemonDetailModal'
@@ -13,22 +13,24 @@ function Pokedex() {
   const [toInput, setToInput] = useState(to)
   const [search, setSearch] = useState<string>('')
   const [modal, setModal] = useState<boolean>(false)
+  const [sortAsc, setSortAsc] = useState(true)
+  const [types, setTypes] = useState<Array<string>>([])
+  const [weaknesses, setWeaknesses] = useState<Array<string>>([])
+  const [abilities, setAbilities] = useState<Array<string>>([])
+
+  const [filterType, setFilterType] = useState<string | null>(null)
+  const [filterWeakness, setFilterWeakness] = useState<string | null>(null)
+  const [filterAbility, setFilterAbility] = useState<string | null>(null)
 
   const { data: pokemonData = [], isLoading } = usePokemonData(from, to)
 
-  /**
-   * @description
-   * Creates a filtered list of Pokémon based on the current search query.
-   * The filtering is case-insensitive and matches any Pokémon whose name
-   * contains the search text.
-   *
-   * Depends on:
-   * - `pokemonData`: the full list of fetched Pokémon
-   * - `search`: the user's input in the search bar
-   */
-  const filteredPokemon = pokemonData.filter((p) =>
-    p.name?.toLowerCase().includes(search.toLowerCase()),
-  )
+  const filteredPokemon = pokemonData
+    .filter((p) => p.id !== undefined)
+    .filter((p) => p.name?.toLowerCase().includes(search.toLowerCase()))
+    .filter((p) => !filterType || p.types?.includes(filterType))
+    .filter((p) => !filterWeakness || p.weaknesses?.includes(filterWeakness))
+    .filter((p) => !filterAbility || p.abilities?.includes(filterAbility))
+    .sort((a, b) => (sortAsc ? a.id! - b.id! : b.id! - a.id!))
 
   function applyRange() {
     const newFrom = Math.max(1, Math.min(fromInput, toInput))
@@ -38,6 +40,25 @@ function Pokedex() {
     setFromInput(newFrom)
     setToInput(newTo)
   }
+
+  useEffect(() => {
+    async function fetchFilters() {
+      const typeRes = await fetch('https://pokeapi.co/api/v2/type')
+      const typeData = await typeRes.json()
+      setTypes(typeData.results.map((t: any) => t.name))
+
+      const abilityRes = await fetch(
+        'https://pokeapi.co/api/v2/ability?limit=1000',
+      )
+      const abilityData = await abilityRes.json()
+      setAbilities(abilityData.results.map((a: any) => a.name))
+
+      // Weaknesses can be derived from type relationships, but for simplicity
+      setWeaknesses(typeData.results.map((t: any) => t.name))
+    }
+
+    fetchFilters()
+  }, [])
 
   return (
     <div className="mt-5 grid grid-cols-1 lg:grid-cols-6 lg:grid-rows-[auto_auto_1fr] lg:gap-4 p-6 lg:px-20">
@@ -67,10 +88,17 @@ function Pokedex() {
       {/* FILTERS */}
       <div className="flex flex-col gap-4 mt-10 lg:mt-0 lg:col-span-4">
         <div className="flex justify-between py-2">
-          {/* ASCENDING */}
-          <div className="flex gap-1 items-center bg-white p-1.5 rounded-lg">
-            <p className="text-sm">Ascending</p>{' '}
-            <ChevronUp className="h-4 w-4" />
+          {/* SORT */}
+          <div
+            className="flex gap-1 items-center bg-white p-1.5 rounded-lg cursor-pointer"
+            onClick={() => setSortAsc(!sortAsc)}
+          >
+            <p className="text-sm">{sortAsc ? 'Ascending' : 'Descending'}</p>
+            {sortAsc ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
           </div>
 
           {/* FROM TO */}
@@ -108,14 +136,50 @@ function Pokedex() {
         </div>
 
         <div className="flex gap-2">
-          {['Type', 'Weakness', 'Ability'].map((item, index) => (
-            <span
-              key={index}
-              className="flex grow items-center justify-between gap-2 text-xs text-link font-bold bg-white p-2 rounded-lg shadow-sm"
+          <div className="p-1 bg-white rounded-lg shadow-sm grow">
+            <select
+              value={filterType ?? ''}
+              onChange={(e) => setFilterType(e.target.value || null)}
+              className="w-full text-sm"
             >
-              {item} <ChevronDown className="h-4 w-4" />
-            </span>
-          ))}
+              <option value="">Type</option>
+              {types.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="p-1 bg-white rounded-lg shadow-sm grow">
+            <select
+              value={filterWeakness ?? ''}
+              onChange={(e) => setFilterWeakness(e.target.value || null)}
+              className="w-full text-sm"
+            >
+              <option value="">Weakness</option>
+              {weaknesses.map((w) => (
+                <option key={w} value={w}>
+                  {w}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="p-1 bg-white rounded-lg shadow-sm grow">
+            <select
+              value={filterAbility ?? ''}
+              onChange={(e) => setFilterAbility(e.target.value || null)}
+              className="w-full text-sm"
+            >
+              <option value="">Ability</option>
+              {abilities.map((a) => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 

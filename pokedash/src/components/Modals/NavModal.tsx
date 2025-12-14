@@ -50,7 +50,7 @@ function NavModal({ onClose }: { onClose: () => void }) {
   return (
     <div
       ref={containerRef}
-      className="fixed top-0 p-5 right-0 min-h-screen w-1/2 bg-info-bg flex justify-center z-10"
+      className="fixed top-0 p-5 right-0 min-h-screen w-1/2 bg-info-bg flex justify-center z-30"
     >
       <span onClick={handleClose} className="absolute top-5 right-5 text-lg">
         {closeText.map((letter, index) => (

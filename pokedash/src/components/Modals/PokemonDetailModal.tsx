@@ -44,9 +44,7 @@ export default function PokemonDetailModal({
   const [stats, setStats] = useState<Array<{ name: string; baseStat: number }>>(
     [],
   )
-  const [weaknesses, setWeaknesses] = useState<
-    Array<{ type: string; multiplier: number }>
-  >([])
+  const [weaknesses, setWeaknesses] = useState<Array<string>>([])
   const [evolutionChain, setEvolutionChain] = useState<
     Array<{ name: string; image: string; minLevel?: number }>
   >([])
@@ -99,6 +97,7 @@ export default function PokemonDetailModal({
       try {
         // FETCH POKEMON DATA
         const pokemon = await getPokemonById(currentId)
+        const pokemonTypes = pokemon.types.map((t: any) => t.type.name)
 
         setName(pokemon.name)
         setImage(pokemon.sprites.other.showdown.front_default)
@@ -111,7 +110,7 @@ export default function PokemonDetailModal({
             baseStat: s.base_stat,
           })),
         )
-        setTypes(pokemon.types.map((t: any) => t.type.name))
+        setTypes(pokemonTypes)
         setAbilities(
           pokemon.abilities.map((a: any) => a.ability.name.replace('-', ' ')),
         )
@@ -134,24 +133,16 @@ export default function PokemonDetailModal({
         }
 
         // WEAKNESSES
-        const pokemonTypes = pokemon.types.map(
-          (t: { type: { name: string } }) => t.type.name,
+        const typeResponses = await Promise.all(
+          pokemonTypes.map(async (typeName: string) => {
+            const typeData = await getPokemonTypeData(typeName)
+            return typeData.damage_relations.double_damage_from.map(
+              (t: { name: string }) => t.name,
+            )
+          }),
         )
 
-        const weaknessCount: { [key: string]: number } = {}
-
-        for (const type of pokemonTypes) {
-          const typeData = await getPokemonTypeData(type)
-          typeData.damage_relations.double_damage_from.forEach((w: any) => {
-            weaknessCount[w.name] = (weaknessCount[w.name] || 0) + 1
-          })
-        }
-        setWeaknesses(
-          Object.keys(weaknessCount).map((type) => ({
-            type,
-            multiplier: weaknessCount[type] === types.length ? 2 : 1,
-          })),
-        )
+        setWeaknesses(Array.from(new Set(typeResponses.flat())))
 
         // EVOLUTION CHAIN
         const evoChainData = await fetch(species.evolution_chain.url)
@@ -313,12 +304,8 @@ export default function PokemonDetailModal({
           {
             title: 'weaknesses',
             data: weaknesses.map((w) => (
-              <span key={w.type} className="relative">
-                <img
-                  src={TYPE_ICONS[w.type]}
-                  alt={w.type}
-                  className="h-7 w-7"
-                />
+              <span key={w} className="relative">
+                <img src={TYPE_ICONS[w]} alt={w} className="h-7 w-7" />
               </span>
             )),
           },

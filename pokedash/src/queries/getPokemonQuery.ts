@@ -1,5 +1,9 @@
 import { QueryClient, useQuery } from '@tanstack/react-query'
-import { getAllPokemon, getPokemonById } from '../services/pokeAPI'
+import {
+  getAllPokemon,
+  getPokemonById,
+  getPokemonTypeData,
+} from '../services/pokeAPI'
 
 export type PokemonProps = {
   id?: number
@@ -7,6 +11,8 @@ export type PokemonProps = {
   name?: string
   order?: number
   types?: Array<string>
+  abilities?: Array<string>
+  weaknesses?: Array<string>
 }
 
 export const queryClient = new QueryClient()
@@ -28,6 +34,20 @@ export async function fetchAllPokemon(
         const id = Number(item.url.split('/').at(-2))
         const res = await getPokemonById(id)
 
+        const types = res.types.map(
+          (t: { type: { name: string } }) => t.type.name,
+        )
+
+        const typeResponses = await Promise.all(
+          types.map(async (typeName: string) => {
+            const typeData = await getPokemonTypeData(typeName)
+            return typeData.damage_relations.double_damage_from.map(
+              (t: { name: string }) => t.name,
+            )
+          }),
+        )
+        const weaknesses = Array.from(new Set(typeResponses.flat()))
+
         return {
           id: res.id,
           image:
@@ -35,7 +55,11 @@ export async function fetchAllPokemon(
             res.sprites.other.dream_world.front_default,
           name: res.name,
           order: res.order,
-          types: res.types.map((t: { type: { name: string } }) => t.type.name),
+          types: types,
+          abilities: res.abilities.map(
+            (a: { ability: { name: string } }) => a.ability.name,
+          ),
+          weaknesses: weaknesses,
         }
       }),
     )

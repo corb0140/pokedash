@@ -235,7 +235,7 @@ export default function PokemonDetailModal({
   return (
     <div
       ref={containerRef}
-      className={` fixed lg:relative h-[95vh] lg:h-[84vh] w-full bottom-0 left-0 bg-white overflow-y-scroll no-scrollbar rounded-t-2xl lg:rounded-b-2xl py-6 px-5 shadow-[-2px_0_10px_rgba(0,0,0,0.1)]`}
+      className={`fixed lg:relative h-[95vh] lg:h-[84vh] w-full bottom-0 left-0 bg-white overflow-y-scroll no-scrollbar rounded-t-2xl lg:rounded-b-2xl py-6 px-5 shadow-[-2px_0_10px_rgba(0,0,0,0.1)]`}
     >
       {/* CLOSE BUTTON */}
       <span

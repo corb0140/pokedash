@@ -1,4 +1,4 @@
-import { createRoute, redirect } from '@tanstack/react-router'
+import { createRoute } from '@tanstack/react-router'
 import { rootRoute } from './__root'
 import Favorites from '@/pages/favorites'
 import { useAuth } from '@/stores/auth'
@@ -7,13 +7,11 @@ export const favoritesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: 'favorites',
 
-  beforeLoad: () => {
+  loader: () => {
     const user = useAuth.getState().user
-    if (!user) {
-      throw redirect({
-        to: '/login',
-        search: { redirect: location.href || '/' },
-      })
+
+    return {
+      isAuthenticated: !!user,
     }
   },
 

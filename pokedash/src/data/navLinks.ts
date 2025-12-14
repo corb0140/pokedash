@@ -17,7 +17,7 @@ export const navLinks = [
   {
     name: 'Favorites',
     path: '/favorites',
-    icon: 'hugeicons:pokeball',
+    icon: 'arcticons:guessthatpokemon',
   },
   {
     name: 'Teams',

@@ -40,9 +40,9 @@ function Pokedex() {
   }
 
   return (
-    <div className="flex flex-col mt-5 p-6 lg:px-20">
+    <div className="mt-5 grid grid-cols-1 lg:grid-cols-6 lg:grid-rows-[auto_auto_1fr] lg:gap-4 p-6 lg:px-20">
       {/* SEARCH BAR */}
-      <div className="relative bg-white rounded-2xl overflow-hidden flex items-center w-full lg:max-w-220">
+      <div className="relative bg-white rounded-xl overflow-hidden flex items-center lg:col-span-4">
         <input
           type="text"
           className="p-5 lg:p-3 shadow-[4px_4px_15px_rgba(0,0,0,0.1)] w-full"
@@ -59,17 +59,24 @@ function Pokedex() {
         </div>
       </div>
 
+      {/* POKEMON MODAL */}
+      <div className="lg:col-span-2 lg:row-span-6 hidden lg:block">
+        {id && <PokemonDetailModal id={id} />}
+      </div>
+
       {/* FILTERS */}
-      <div className="flex flex-col gap-4 mt-10 lg:mt-5 lg:max-w-220">
+      <div className="flex flex-col gap-4 mt-10 lg:mt-0 lg:col-span-4">
         <div className="flex justify-between py-2">
-          <div className="flex gap-1 items-center">
-            <p className="text-sm">Ascending</p> <ChevronUp />
+          {/* ASCENDING */}
+          <div className="flex gap-1 items-center bg-white p-1.5 rounded-lg">
+            <p className="text-sm">Ascending</p>{' '}
+            <ChevronUp className="h-4 w-4" />
           </div>
 
           {/* FROM TO */}
           <div className="flex gap-3">
             <div className="flex gap-0.5 items-center">
-              <p className="text-sm font-semibold">From:</p>
+              <p className="text-sm">From:</p>
               <input
                 type="number"
                 min={1}
@@ -84,7 +91,7 @@ function Pokedex() {
             </div>
 
             <div className="flex gap-0.5 items-center">
-              <p className="text-sm font-semibold">To:</p>
+              <p className="text-sm">To:</p>
               <input
                 type="number"
                 min={1}
@@ -113,14 +120,14 @@ function Pokedex() {
       </div>
 
       {/* POKEMON LIST */}
-      {isLoading ? (
-        <div className="flex flex-col items-center justify-center mt-10 h-[50vh]">
-          <Loader2 className="animate-loader h-16 w-16 text-red-500" />
-          <p className="mt-4 text-lg">Loading Pokémon...</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-6 lg:grid-flow-row lg:gap-4">
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mt-10 lg:mt-5 lg:px-1 lg:col-span-4 lg:h-[55vh] lg:overflow-y-scroll">
+      <div className="lg:col-span-4">
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center mt-10 h-[50vh]">
+            <Loader2 className="animate-loader h-16 w-16 text-red-500" />
+            <p className="mt-4 text-lg">Loading Pokémon...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mt-10 lg:mt-5 lg:px-1 lg:h-[55vh] lg:overflow-y-scroll">
             {filteredPokemon.map((data) => (
               <div
                 onClick={() => {
@@ -159,12 +166,8 @@ function Pokedex() {
               </div>
             ))}
           </div>
-
-          <div className="lg:col-span-2 relative -top-51 hidden lg:block">
-            {id && <PokemonDetailModal id={id} />}
-          </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {modal && window.innerWidth < 1024 && (
         <PokemonDetailModal id={id} onClose={() => setModal(false)} />

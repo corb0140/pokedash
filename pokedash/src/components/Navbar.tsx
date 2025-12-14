@@ -11,7 +11,7 @@ export default function Navbar() {
   const user = useAuth.getState().user
 
   return (
-    <div className="py-3 lg:py-4 px-4 lg:px-10 flex justify-between items-center shadow-sm bg-white mx-4 lg:mx-20 mt-5 rounded-xl">
+    <div className="py-3 lg:py-4.5 px-4 lg:px-10 flex justify-between items-center shadow-sm bg-white mx-4 lg:mx-20 mt-5 rounded-xl">
       <h1 className="text-xl">pokedash</h1>
 
       <Menu onClick={() => setShowModal(true)} className="lg:hidden" />
@@ -22,19 +22,33 @@ export default function Navbar() {
             key={index}
             to={link.path}
             activeOptions={{ exact: true }}
-            inactiveProps={{ className: 'text-link' }}
-            activeProps={{ className: `text-active-link` }}
-            className="flex gap-2 items-center"
+            inactiveProps={{
+              className: 'text-link ',
+            }}
+            activeProps={{
+              className: `text-active-link`,
+            }}
+            className="flex flex-col gap-2 items-center transition-colors duration-300"
           >
-            <Icon icon={link.icon} className={`h-8 w-8`} />
-            <p className={`text-sm font-semibold`}>{link.name}</p>
+            <div className="flex gap-2 items-center">
+              <Icon
+                icon={link.icon}
+                className="h-[clamp(1.1rem,2vw,2rem)] w-[clamp(1.1rem,2vw,2rem)]"
+              />
+              <p className="text-[clamp(0.7rem,1.1vw,0.875rem)] font-semibold font-orbitron">
+                {link.name}
+              </p>
+            </div>
           </Link>
         ))}
       </div>
 
       <div className="hidden lg:flex">
         {!user ? (
-          <Link to="/login" className="text-sm text-link font-semibold">
+          <Link
+            to="/login"
+            className="text-[clamp(0.7rem,1.1vw,0.875rem)] text-link font-semibold font-orbitron"
+          >
             Login
           </Link>
         ) : (

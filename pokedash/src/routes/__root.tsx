@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar'
 export const rootRoute = createRootRoute({
   component: () => (
     <div>
-      <div className="fixed -top-25 -left-25">
+      <div className="absolute -top-25 -left-25">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-80 w-80 lg:h-150 lg:w-150"

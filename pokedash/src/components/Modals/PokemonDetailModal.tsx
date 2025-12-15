@@ -2,14 +2,12 @@ import gsap from 'gsap'
 import { useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { PokemonProps } from '@/queries/getPokemonQuery'
+import { usePokemonStore } from '@/stores/pokemonStore'
+import { usePokemonDetail } from '@/queries/usePokemonDetail'
 import { TYPE_ICONS } from '@/constants/typeIcons'
 import { STATS } from '@/constants/stats'
 import { TYPE_COLORS } from '@/constants/typeColors'
-import {
-  getPokemonById,
-  getPokemonSpeciesById,
-  getPokemonTypeData,
-} from '@/services/pokeAPI'
+import { getPokemonById } from '@/services/pokeAPI'
 
 export type PokemonDetailModalProps = PokemonProps & {
   onClose?: () => void
@@ -19,19 +17,14 @@ export default function PokemonDetailModal({
   onClose,
   id,
 }: PokemonDetailModalProps) {
+  const { selectedId, setSelectedId } = usePokemonStore()
+  const { data: pokemonData } = usePokemonDetail(selectedId)
+
   const containerRef = useRef<HTMLDivElement>(null)
   const lettersRef = useRef<Array<HTMLSpanElement>>([])
 
   const closeText = [...'close']
-  const [name, setName] = useState<string>('')
-  const [image, setImage] = useState<string | null>(null)
-  const [height, setHeight] = useState<number>()
-  const [weight, setWeight] = useState<number>()
-  const [baseXP, setBaseXP] = useState<number>()
-  const [description, setDescription] = useState<string>('')
-  const [types, setTypes] = useState<Array<string>>([])
-  const [abilities, setAbilities] = useState<Array<string>>([])
-  const [currentId, setCurrentId] = useState<number | number>(id || 1)
+
   const [prevPokemon, setPrevPokemon] = useState<{
     name: string
     image: string
@@ -40,14 +33,6 @@ export default function PokemonDetailModal({
     name: string
     image: string
   } | null>(null)
-
-  const [stats, setStats] = useState<Array<{ name: string; baseStat: number }>>(
-    [],
-  )
-  const [weaknesses, setWeaknesses] = useState<Array<string>>([])
-  const [evolutionChain, setEvolutionChain] = useState<
-    Array<{ name: string; image: string; minLevel?: number }>
-  >([])
 
   // STOP SCROLL
   useEffect(() => {
@@ -89,99 +74,14 @@ export default function PokemonDetailModal({
     })
   }
 
-  // FETCH POKEMON DATA
+  // FETCH NEXT & PREVIOUS POKEMON DATA
   useEffect(() => {
     async function fetchData() {
-      if (!currentId) return
+      if (!id) return
 
       try {
-        // FETCH POKEMON DATA
-        const pokemon = await getPokemonById(currentId)
-        const pokemonTypes = pokemon.types.map((t: any) => t.type.name)
-
-        setName(pokemon.name)
-        setImage(pokemon.sprites.other.showdown.front_default)
-        setHeight(pokemon.height)
-        setWeight(pokemon.weight)
-        setBaseXP(pokemon.base_experience)
-        setStats(
-          pokemon.stats.map((s: any) => ({
-            name: s.stat.name,
-            baseStat: s.base_stat,
-          })),
-        )
-        setTypes(pokemonTypes)
-        setAbilities(
-          pokemon.abilities.map((a: any) => a.ability.name.replace('-', ' ')),
-        )
-
-        // FETCH GET POKEMON SPECIES
-        const species = await getPokemonSpeciesById(currentId)
-
-        // DESCRIPTION (FlAVOUR TEXT)
-        const englishEntry = species.flavor_text_entries.find(
-          (entry: any) => entry.language.name === 'en',
-        )
-
-        if (englishEntry) {
-          const cleaned = englishEntry.flavor_text
-            .replace(/\n/g, ' ') // remove line breaks
-            .replace(/\f/g, ' ') // remove weird formatting char
-            .trim()
-
-          setDescription(cleaned)
-        }
-
-        // WEAKNESSES
-        const typeResponses = await Promise.all(
-          pokemonTypes.map(async (typeName: string) => {
-            const typeData = await getPokemonTypeData(typeName)
-            return typeData.damage_relations.double_damage_from.map(
-              (t: { name: string }) => t.name,
-            )
-          }),
-        )
-
-        setWeaknesses(Array.from(new Set(typeResponses.flat())))
-
-        // EVOLUTION CHAIN
-        const evoChainData = await fetch(species.evolution_chain.url)
-        const evoChainJson = await evoChainData.json()
-
-        const evoArray: Array<{
-          name: string
-          image: string
-          minLevel?: number
-        }> = []
-
-        let current = evoChainJson.chain
-        let prevEvolutionDetails = null
-
-        while (current) {
-          const evoName = current.species.name
-          const evoPokemon = await getPokemonById(evoName)
-
-          const minLevel = prevEvolutionDetails?.min_level ?? undefined
-
-          evoArray.push({
-            name: evoName,
-            image:
-              evoPokemon.sprites.other['official-artwork'].front_default ??
-              evoPokemon.sprites.front_default,
-            minLevel,
-          })
-
-          prevEvolutionDetails =
-            current.evolves_to[0]?.evolution_details?.[0] ?? null
-
-          current = current.evolves_to[0]
-        }
-
-        setEvolutionChain(evoArray)
-
-        // NEXT AND PREVIOUS SETTING IMAGES AND NAME
-        if (currentId > 1) {
-          const prev = await getPokemonById(currentId - 1)
+        if (id > 1) {
+          const prev = await getPokemonById(id - 1)
           setPrevPokemon({
             name: prev.name,
             image: prev.sprites.other.showdown.front_default,
@@ -190,8 +90,8 @@ export default function PokemonDetailModal({
           setPrevPokemon(null)
         }
 
-        if (currentId < 1350) {
-          const next = await getPokemonById(currentId + 1)
+        if (id < 1350) {
+          const next = await getPokemonById(id + 1)
           setNextPokemon({
             name: next.name,
             image: next.sprites.other.showdown.front_default,
@@ -205,23 +105,26 @@ export default function PokemonDetailModal({
     }
 
     fetchData()
-  }, [currentId, id])
+  }, [id])
 
   const handlePrev = () => {
-    if (!currentId) return
-    if (currentId > 1) setCurrentId(currentId - 1)
+    if (!selectedId) return
+    if (selectedId > 1) setSelectedId(selectedId - 1)
   }
 
   const handleNext = () => {
-    if (!currentId) return
-    if (currentId < 1350) setCurrentId(currentId + 1)
+    if (!selectedId) return
+    if (selectedId < 1350) setSelectedId(selectedId + 1)
   }
 
   //   RERENDER ON LARGE SCREENS
   useEffect(() => {
     if (!id) return
-    setCurrentId(id)
+
+    if (!selectedId) setSelectedId(id)
   }, [id])
+
+  if (!pokemonData) return
 
   return (
     <div
@@ -249,22 +152,24 @@ export default function PokemonDetailModal({
       {/* IMAGE */}
       <div className="h-40 w-full mt-15 lg:mt-5 mb-5">
         <img
-          src={image || undefined}
-          alt={name}
+          src={pokemonData.image}
+          alt={pokemonData.name}
           className="h-full w-full object-contain mx-auto mb-4"
         />
       </div>
 
       {/* NAME, TYPES, DESCRIPTION */}
       <div className="mt-5 flex flex-col gap-1 items-center text-sm">
-        <p className="font-bold text-[18px] text-link">#{currentId}</p>
+        <p className="font-bold text-[18px] text-link">#{selectedId}</p>
 
         {/* NAME */}
-        <h2 className="text-2xl text-info-text font-bold capitalize">{name}</h2>
+        <h2 className="text-2xl text-info-text font-bold capitalize">
+          {pokemonData.name}
+        </h2>
 
         {/* TYPES */}
         <div className="my-2 flex gap-3 flex-wrap justify-center text-sm">
-          {types.map((t) => (
+          {pokemonData.types.map((t: any) => (
             <span
               key={t}
               className={`p-2 rounded-lg text-white uppercase font-bold text-[12px] ${TYPE_COLORS[t]}`}
@@ -275,7 +180,7 @@ export default function PokemonDetailModal({
         </div>
 
         {/* DESCRIPTION */}
-        <p className="text-center">{description}</p>
+        <p className="text-center">{pokemonData.description}</p>
       </div>
 
       {/* ABILITIES */}
@@ -285,7 +190,7 @@ export default function PokemonDetailModal({
         </h3>
 
         <div className="flex gap-3">
-          {abilities.map((a, index) => (
+          {pokemonData.abilities.map((a: any, index: number) => (
             <span
               key={a}
               className={`capitalize font-bold grow bg-page-background px-5 py-1.5 border rounded-lg text-sm ${index === 0 ? 'border-link' : 'border-ability-border'}`}
@@ -299,17 +204,17 @@ export default function PokemonDetailModal({
       {/* GRID - HEIGHT, BASE, WEIGHT, WEAKNESS */}
       <div className="mt-5 grid grid-cols-2 grid-rows-2 gap-4">
         {[
-          { title: 'height', data: height },
-          { title: 'weight', data: weight },
+          { title: 'height', data: pokemonData.height },
+          { title: 'weight', data: pokemonData.weight },
           {
             title: 'weaknesses',
-            data: weaknesses.map((w) => (
+            data: pokemonData.weaknesses.map((w) => (
               <span key={w} className="relative">
                 <img src={TYPE_ICONS[w]} alt={w} className="h-7 w-7" />
               </span>
             )),
           },
-          { title: 'baseXP', data: baseXP },
+          { title: 'baseXP', data: pokemonData.baseXP },
         ].map((item, index) => (
           <div key={index} className="flex flex-col items-center gap-1.5">
             <h3 className="uppercase tracking-widest text-info-text text-sm flex">
@@ -329,7 +234,7 @@ export default function PokemonDetailModal({
         <h3 className="font-semibold mb-2">Stats</h3>
 
         <div className="flex gap-3">
-          {stats.map((s) => {
+          {pokemonData.stats.map((s: any) => {
             const stat = STATS[s.name]
 
             return (
@@ -356,7 +261,7 @@ export default function PokemonDetailModal({
         <h3 className="font-semibold mb-2">Evolution Chain</h3>
 
         <div className="flex items-center justify-center gap-4">
-          {evolutionChain.map((evo, index) => (
+          {pokemonData.evolutionChain.map((evo: any, index: number) => (
             <div key={evo.name} className="flex items-center gap-4">
               <div className="flex flex-col items-center">
                 <img
@@ -370,9 +275,11 @@ export default function PokemonDetailModal({
                 </span>
               </div>
 
-              {index < evolutionChain.length - 1 && (
+              {index < pokemonData.evolutionChain.length - 1 && (
                 <div className="flex flex-col items-center text-xs font-semibold text-link">
-                  <span>Lv. {evolutionChain[index + 1].minLevel ?? '?'}</span>
+                  <span>
+                    Lv. {pokemonData.evolutionChain[index + 1].minLevel ?? '?'}
+                  </span>
                 </div>
               )}
             </div>
@@ -400,7 +307,7 @@ export default function PokemonDetailModal({
               <span className="capitalize">{prevPokemon.name}</span>
 
               <span className="font-semibold text-sm">
-                #{currentId && currentId - 1}
+                #{selectedId && selectedId - 1}
               </span>
             </>
           )}
@@ -416,7 +323,7 @@ export default function PokemonDetailModal({
           {nextPokemon && (
             <>
               <span className="font-semibold text-sm">
-                #{currentId && currentId + 1}
+                #{selectedId && selectedId + 1}
               </span>
 
               <span className="capitalize">{nextPokemon.name}</span>

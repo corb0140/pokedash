@@ -12,7 +12,9 @@ export default function Navbar() {
 
   return (
     <div className="py-3 lg:py-4.5 px-4 lg:px-10 flex justify-between items-center shadow-sm bg-white mx-4 lg:mx-20 mt-5 rounded-xl">
-      <h1 className="text-xl">pokedash</h1>
+      <Link to="/">
+        <h1 className="text-xl">pokedash</h1>
+      </Link>
 
       <Menu onClick={() => setShowModal(true)} className="lg:hidden" />
 

@@ -1,36 +1,41 @@
 import { Icon } from '@iconify/react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
-import { usePokemonData } from '@/queries/getPokemonQuery'
 import PokemonDetailModal from '@/components/Modals/PokemonDetailModal'
 import { TYPE_COLORS } from '@/constants/typeColors'
+import { filterPokemon } from '@/utils/pokemonSelectors'
+import { usePokemonList } from '@/queries/usePokemonList'
+import { usePokemonStore } from '@/stores/pokemonStore'
 
 function Pokedex() {
-  const [id, setId] = useState<number | undefined>(1)
   const [from, setFrom] = useState(1)
   const [to, setTo] = useState(1350)
   const [fromInput, setFromInput] = useState(from)
   const [toInput, setToInput] = useState(to)
-  const [search, setSearch] = useState<string>('')
-  const [modal, setModal] = useState<boolean>(false)
-  const [sortAsc, setSortAsc] = useState(true)
-  const [types, setTypes] = useState<Array<string>>([])
-  const [weaknesses, setWeaknesses] = useState<Array<string>>([])
-  const [abilities, setAbilities] = useState<Array<string>>([])
 
-  const [filterType, setFilterType] = useState<string | null>(null)
-  const [filterWeakness, setFilterWeakness] = useState<string | null>(null)
-  const [filterAbility, setFilterAbility] = useState<string | null>(null)
+  const { data: pokemonData = [], isLoading } = usePokemonList(from, to)
 
-  const { data: pokemonData = [], isLoading } = usePokemonData(from, to)
+  const {
+    filters,
+    setFilter,
+    selectedId,
+    setSelectedId,
+    openModal,
+    closeModal,
+    isModalOpen,
+  } = usePokemonStore()
 
-  const filteredPokemon = pokemonData
-    .filter((p) => p.id !== undefined)
-    .filter((p) => p.name?.toLowerCase().includes(search.toLowerCase()))
-    .filter((p) => !filterType || p.types?.includes(filterType))
-    .filter((p) => !filterWeakness || p.weaknesses?.includes(filterWeakness))
-    .filter((p) => !filterAbility || p.abilities?.includes(filterAbility))
-    .sort((a, b) => (sortAsc ? a.id! - b.id! : b.id! - a.id!))
+  const filteredPokemon = filterPokemon(pokemonData, filters)
+
+  const allTypes = Array.from(
+    new Set(pokemonData.flatMap((p) => p.types ?? [])),
+  )
+  const allWeaknesses = Array.from(
+    new Set(pokemonData.flatMap((p) => p.weaknesses ?? [])),
+  )
+  const allAbilities = Array.from(
+    new Set(pokemonData.flatMap((p) => p.abilities ?? [])),
+  )
 
   function applyRange() {
     const newFrom = Math.max(1, Math.min(fromInput, toInput))
@@ -41,25 +46,6 @@ function Pokedex() {
     setToInput(newTo)
   }
 
-  useEffect(() => {
-    async function fetchFilters() {
-      const typeRes = await fetch('https://pokeapi.co/api/v2/type')
-      const typeData = await typeRes.json()
-      setTypes(typeData.results.map((t: any) => t.name))
-
-      const abilityRes = await fetch(
-        'https://pokeapi.co/api/v2/ability?limit=1000',
-      )
-      const abilityData = await abilityRes.json()
-      setAbilities(abilityData.results.map((a: any) => a.name))
-
-      // Weaknesses can be derived from type relationships, but for simplicity
-      setWeaknesses(typeData.results.map((t: any) => t.name))
-    }
-
-    fetchFilters()
-  }, [])
-
   return (
     <div className="mt-5 grid grid-cols-1 lg:grid-cols-6 lg:grid-rows-[auto_auto_1fr] lg:gap-4 p-6 lg:px-20">
       {/* SEARCH BAR */}
@@ -68,8 +54,8 @@ function Pokedex() {
           type="text"
           className="p-5 lg:p-3 shadow-[4px_4px_15px_rgba(0,0,0,0.1)] w-full"
           placeholder="Search your pokemon!"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={filters.search}
+          onChange={(e) => setFilter('search', e.target.value)}
         />
 
         <div className="absolute right-4 flex items-center justify-center h-8 w-8 lg:h-6 lg:w-6 rounded-xl bg-active-link shadow-[0_0_20px_hsl(3,88%,64%)]">
@@ -82,7 +68,7 @@ function Pokedex() {
 
       {/* POKEMON MODAL */}
       <div className="lg:col-span-2 lg:row-span-6 hidden lg:block">
-        {id && <PokemonDetailModal id={id} />}
+        {selectedId && <PokemonDetailModal id={selectedId} />}
       </div>
 
       {/* FILTERS */}
@@ -91,10 +77,12 @@ function Pokedex() {
           {/* SORT */}
           <div
             className="flex gap-1 items-center bg-white p-1.5 rounded-lg cursor-pointer"
-            onClick={() => setSortAsc(!sortAsc)}
+            onClick={() => setFilter('sortAsc', !filters.sortAsc)}
           >
-            <p className="text-sm">{sortAsc ? 'Ascending' : 'Descending'}</p>
-            {sortAsc ? (
+            <p className="text-sm">
+              {filters.sortAsc ? 'Ascending' : 'Descending'}
+            </p>
+            {filters.sortAsc ? (
               <ChevronUp className="h-4 w-4" />
             ) : (
               <ChevronDown className="h-4 w-4" />
@@ -138,12 +126,12 @@ function Pokedex() {
         <div className="flex gap-2">
           <div className="p-1 bg-white rounded-lg shadow-sm grow">
             <select
-              value={filterType ?? ''}
-              onChange={(e) => setFilterType(e.target.value || null)}
+              value={filters.type ?? ''}
+              onChange={(e) => setFilter('type', e.target.value || null)}
               className="w-full text-sm"
             >
               <option value="">Type</option>
-              {types.map((t) => (
+              {allTypes.map((t) => (
                 <option key={t} value={t}>
                   {t}
                 </option>
@@ -153,12 +141,12 @@ function Pokedex() {
 
           <div className="p-1 bg-white rounded-lg shadow-sm grow">
             <select
-              value={filterWeakness ?? ''}
-              onChange={(e) => setFilterWeakness(e.target.value || null)}
+              value={filters.weakness ?? ''}
+              onChange={(e) => setFilter('weakness', e.target.value || null)}
               className="w-full text-sm"
             >
               <option value="">Weakness</option>
-              {weaknesses.map((w) => (
+              {allWeaknesses.map((w) => (
                 <option key={w} value={w}>
                   {w}
                 </option>
@@ -168,12 +156,12 @@ function Pokedex() {
 
           <div className="p-1 bg-white rounded-lg shadow-sm grow">
             <select
-              value={filterAbility ?? ''}
-              onChange={(e) => setFilterAbility(e.target.value || null)}
+              value={filters.ability ?? ''}
+              onChange={(e) => setFilter('ability', e.target.value || null)}
               className="w-full text-sm"
             >
               <option value="">Ability</option>
-              {abilities.map((a) => (
+              {allAbilities.map((a: any) => (
                 <option key={a} value={a}>
                   {a}
                 </option>
@@ -195,8 +183,8 @@ function Pokedex() {
             {filteredPokemon.map((data) => (
               <div
                 onClick={() => {
-                  setId(data.id)
-                  setModal(true)
+                  setSelectedId(data.id ?? 1)
+                  openModal()
                 }}
                 key={data.id}
                 className="bg-white shadow-sm rounded-lg px-5 py-10 lg:py-4 flex flex-col gap-2 items-center relative lg:max-h-80"
@@ -233,8 +221,8 @@ function Pokedex() {
         )}
       </div>
 
-      {modal && window.innerWidth < 1024 && (
-        <PokemonDetailModal id={id} onClose={() => setModal(false)} />
+      {isModalOpen && window.innerWidth < 1024 && (
+        <PokemonDetailModal id={selectedId ?? 1} onClose={() => closeModal()} />
       )}
     </div>
   )

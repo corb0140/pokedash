@@ -1,21 +1,106 @@
 import { useEffect, useState } from 'react'
-import { Play, StepBack, StepForward } from 'lucide-react'
+import { Pause, Play, StepBack, StepForward } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import Footer from './components/Footer'
+import { TYPE_COLORS } from './constants/typeColors'
+import { usePokemonDetail } from './queries/usePokemonDetail'
+import { getAllPokemonTypes, getPokemonTypeData } from './services/pokeAPI'
 import { prefetchPokemonData } from '@/queries/getPokemonQuery'
+import { useAudioPlayer } from '@/hooks/useAudioPlayer'
+import { formatTime } from '@/utils/formatTime'
 
 function App() {
-  const [selectedType, setSelectedType] = useState('')
-  const [currentTrack, setCurrentTrack] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(false)
+  const [randomPokemon, setRandomPokemon] = useState(
+    () => Math.floor(Math.random() * 1350) + 1,
+  )
+  const { data: pokemonData } = usePokemonDetail(randomPokemon)
+  const [input, setInput] = useState<string>('')
+  const [isGuessCorrect, setIsGuessCorrect] = useState<boolean>(false)
+  const [types, setTypes] = useState<Array<string>>([])
+  const [selectedType, setSelectedType] = useState('Normal')
+  const [typeDamage, setTypeDamage] = useState<{
+    strong: Array<string>
+    weak: Array<string>
+    immune: Array<string>
+  }>({
+    strong: [],
+    weak: [],
+    immune: [],
+  })
+
+  // AUDIO
+  const {
+    tracks,
+    currentTrack,
+    isPlaying,
+    currentTime,
+    duration,
+    togglePlay,
+    nextTrack,
+    prevTrack,
+    seek,
+    setCurrentTrack,
+  } = useAudioPlayer()
 
   useEffect(() => {
     prefetchPokemonData()
   }, [])
 
+  // TYPE MATCH-UPS
+  useEffect(() => {
+    const fetchTypes = async () => {
+      try {
+        const res = await getAllPokemonTypes()
+
+        const filtered = res.results
+          .map((t: { name: string }) => t.name)
+          .filter((t: string) => t !== 'unknown' && t !== 'stellar')
+
+        setTypes(filtered)
+      } catch (error) {
+        console.error('Failed to fetch types', error)
+      }
+    }
+
+    fetchTypes()
+  }, [])
+
+  useEffect(() => {
+    if (!selectedType) return
+
+    const fetchTypeDetails = async () => {
+      const res = await getPokemonTypeData(selectedType)
+      const data = res.damage_relations
+
+      setTypeDamage({
+        strong: [...data.double_damage_to.map((e: { name: string }) => e.name)],
+        weak: [...data.double_damage_from.map((e: { name: string }) => e.name)],
+        immune: [...data.no_damage_from.map((e: { name: string }) => e.name)],
+      })
+    }
+
+    fetchTypeDetails()
+  }, [selectedType])
+
+  // GUESS GAME
+  const handleGuessPokemon = (guess: string) => {
+    if (pokemonData?.name.trim().toLowerCase() === guess.trim().toLowerCase()) {
+      setIsGuessCorrect(true)
+      setInput('')
+    } else {
+      setInput('')
+    }
+  }
+
+  const resetGame = () => {
+    setIsGuessCorrect(false)
+    setInput('')
+    setRandomPokemon(Math.floor(Math.random() * 1350) + 1)
+  }
+
   return (
     <>
-      <div className="flex flex-col p-6 lg:px-20 lg:py-10">
+      <div className="flex flex-col py-6 px-10 lg:px-20 lg:py-10">
         {/* HERO */}
         <section className="flex flex-col lg:flex-row items-center justify-between gap-8">
           <div className="flex flex-col gap-6">
@@ -65,17 +150,58 @@ function App() {
         >
           <h2 className="text-2xl font-bold">Guess the Pokemon!</h2>
 
-          <div className="bg-white w-full min-h-60 rounded-xl flex items-center justify-center text-xl">
-            ?
+          <div className="bg-white w-full min-h-60 rounded-xl flex items-center justify-center text-xl p-4">
+            <img
+              src={pokemonData?.image}
+              alt=""
+              className={`h-1/2 w-1/2 object-contain transition-all duration-300 ${isGuessCorrect ? 'brightness-100' : 'brightness-0'}`}
+            />
           </div>
+
           <input
             type="text"
-            placeholder="Enter Pokémon name"
+            placeholder={isGuessCorrect ? 'End of Game' : 'Enter Pokémon Name'}
             className="border border-white text-white rounded-lg px-4 py-2 w-full text-center"
+            value={input}
+            onChange={(e) => setInput(e.currentTarget.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleGuessPokemon(input)}
+            disabled={isGuessCorrect}
           />
-          <button className="px-6 py-2 text-info-text bg-white rounded-lg hover:scale-105 transition">
-            Guess
-          </button>
+
+          {/* BUTTONS */}
+          {!isGuessCorrect ? (
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleGuessPokemon(input)}
+                className="px-6 py-2 text-info-text bg-white rounded-lg hover:scale-105 transition"
+                disabled={isGuessCorrect}
+              >
+                Guess
+              </button>
+              <button
+                onClick={resetGame}
+                className="px-6 py-2 text-info-text bg-white rounded-lg hover:scale-105 transition"
+                disabled={isGuessCorrect}
+              >
+                New Guess
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={resetGame}
+              className="px-6 py-2 text-info-text bg-white rounded-lg hover:scale-105 transition"
+            >
+              Reset Game
+            </button>
+          )}
+
+          <p
+            className={`${isGuessCorrect ? 'block' : 'hidden'} text-lg text-center text-info-text font-bold tracking-wider uppercase`}
+          >
+            {isGuessCorrect
+              ? `It's ${pokemonData?.name}`
+              : 'Wrong Guess, Try Again'}
+          </p>
         </section>
 
         {/* MATCH-UPS */}
@@ -84,15 +210,16 @@ function App() {
             Type Matchups Trainer
           </h2>
 
-          <div className="flex justify-center gap-4">
-            {['Fire', 'Water', 'Grass'].map((type) => (
+          {/* BUTTONS */}
+          <div className="flex flex-wrap justify-center gap-4">
+            {types.map((type) => (
               <button
                 key={type}
                 onClick={() => setSelectedType(type)}
-                className={`px-4 py-2 rounded-xl ${
+                className={`px-4 py-2 rounded-xl grow capitalize ${
                   selectedType === type
-                    ? 'bg-red-500 text-white'
-                    : 'bg-white border border-gray-300'
+                    ? `${TYPE_COLORS[type]} text-white`
+                    : 'bg-white'
                 } transition`}
               >
                 {type}
@@ -100,21 +227,59 @@ function App() {
             ))}
           </div>
 
+          {/* DATA */}
           <div className="flex flex-col gap-2 mt-4 p-2 text-center">
-            <div>
-              <h3 className="font-semibold">Strong Against</h3>
-              <p className="mt-1 text-gray-600">Grass, Bug</p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold">Weak Against</h3>
-              <p className="mt-1 text-gray-600">Water, Rock</p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold">Immune To</h3>
-              <p className="mt-1 text-gray-600">None</p>
-            </div>
+            {[
+              {
+                title: 'Strong Against',
+                typeDamage: typeDamage.strong.map((s: any, index) => (
+                  <p
+                    key={index}
+                    className={`${TYPE_COLORS[s]} p-1.5 grow rounded-md`}
+                  >
+                    {s}
+                  </p>
+                )),
+              },
+              {
+                title: 'Weak Against',
+                typeDamage: typeDamage.weak.map((w: any, index) => (
+                  <p
+                    key={index}
+                    className={`${TYPE_COLORS[w]} p-1.5 grow rounded-md`}
+                  >
+                    {w}
+                  </p>
+                )),
+              },
+              {
+                title: 'Immune To',
+                typeDamage:
+                  typeDamage.immune.length > 0 ? (
+                    typeDamage.immune.map((i: string) => (
+                      <p
+                        key={i}
+                        className={`${TYPE_COLORS[i]} p-1.5 rounded-md grow`}
+                      >
+                        {i}
+                      </p>
+                    ))
+                  ) : (
+                    <p className="bg-link text-white p-1.5 rounded-md grow">
+                      None
+                    </p>
+                  ),
+              },
+            ].map((data, index) => (
+              <div key={index}>
+                <h3 className="font-semibold">{data.title}</h3>
+                <span
+                  className={`mt-2 p-3 flex flex-wrap gap-2 text-white capitalize font-bold`}
+                >
+                  {data.typeDamage}
+                </span>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -123,32 +288,68 @@ function App() {
           <h2 className="text-2xl font-bold">Pokémon Music Player</h2>
 
           <div className="flex flex-col items-center gap-6 w-full">
-            <div className="w-full">
-              <p className="font-semibold text-lg">current track</p>
+            {/* CURRENT TRACK */}
+            <p className="font-semibold text-lg w-full">
+              {tracks[currentTrack].title}
+            </p>
+
+            {/* PROGRESS BAR */}
+            <div className="w-full flex flex-col gap-1">
+              <input
+                type="range"
+                min={0}
+                max={duration || 0}
+                value={currentTime}
+                onChange={(e) => seek(Number(e.target.value))}
+                className="w-full accent-white cursor-pointer"
+              />
+
+              <div className="flex justify-between text-sm opacity-80">
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(duration)}</span>
+              </div>
             </div>
 
+            {/* BUTTONS */}
             <div className="w-full flex gap-3">
               <button
-                // onClick={prevTrack}
+                onClick={prevTrack}
                 className="p-2 px-4 bg-white text-hp rounded-full"
               >
                 <StepBack />
               </button>
 
               <button
-                // onClick={togglePlay}
+                onClick={togglePlay}
                 className="grow p-2 bg-white text-hp rounded-full flex justify-center"
               >
-                {isPlaying ? '❚❚' : <Play />}
+                {isPlaying ? <Pause /> : <Play />}
               </button>
 
               <button
-                // onClick={nextTrack}
+                onClick={nextTrack}
                 className="p-2 px-4 bg-white text-hp rounded-full"
               >
                 <StepForward />
               </button>
             </div>
+          </div>
+
+          {/* TRACK LIST */}
+          <div className="w-full mt-4 flex flex-col gap-2">
+            {tracks.map((track, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentTrack(index)}
+                className={`px-4 py-2 rounded-lg text-left transition ${
+                  currentTrack === index
+                    ? 'bg-white text-hp font-bold'
+                    : 'bg-white/20 hover:cursor-pointer'
+                }`}
+              >
+                {index + 1}. {track.title}
+              </button>
+            ))}
           </div>
         </section>
       </div>

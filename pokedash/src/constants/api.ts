@@ -8,4 +8,5 @@ export const ApiEndpoints = {
   GET_POKEMON_SPECIES_BY_ID: (id: number) => `pokemon-species/${id}`,
   GET_POKEMON_TYPE_DATA: (type: string) =>
     `https://pokeapi.co/api/v2/type/${type}`,
+  GET_ALL_POKEMON_TYPES: 'https://pokeapi.co/api/v2/type',
 }

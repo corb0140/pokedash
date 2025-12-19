@@ -42,3 +42,12 @@ export async function getPokemonTypeData(type: string) {
     console.error('Error fetching pokemon: ', error)
   }
 }
+
+export async function getAllPokemonTypes() {
+  try {
+    const res = await pokeApi.get(ApiEndpoints.GET_ALL_POKEMON_TYPES)
+    return res.data
+  } catch (error) {
+    console.error('Error fetching pokemon: ', error)
+  }
+}

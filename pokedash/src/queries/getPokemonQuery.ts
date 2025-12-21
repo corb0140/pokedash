@@ -1,4 +1,4 @@
-import { QueryClient, useQuery } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
 import {
   getAllPokemon,
   getPokemonById,
@@ -69,17 +69,10 @@ export async function fetchAllPokemon(
   return results
 }
 
-export function usePokemonData(from = 1, to = 1350) {
-  return useQuery<Array<PokemonProps>, Error>({
-    queryKey: ['pokemon', from, to],
-    queryFn: () => fetchAllPokemon(from, to),
-    staleTime: 1000 * 60 * 5,
-  })
-}
-
 export function prefetchPokemonData(from = 1, to = 1350) {
   return queryClient.prefetchQuery({
     queryKey: ['pokemon', from, to],
     queryFn: () => fetchAllPokemon(from, to),
+    staleTime: 1000 * 60 * 60,
   })
 }

@@ -17,7 +17,7 @@ function App() {
   const [input, setInput] = useState<string>('')
   const [isGuessCorrect, setIsGuessCorrect] = useState<boolean>(false)
   const [types, setTypes] = useState<Array<string>>([])
-  const [selectedType, setSelectedType] = useState('Normal')
+  const [selectedType, setSelectedType] = useState('normal')
   const [typeDamage, setTypeDamage] = useState<{
     strong: Array<string>
     weak: Array<string>
@@ -102,27 +102,27 @@ function App() {
     <>
       <div className="flex flex-col py-6 px-10 lg:px-20 lg:py-10">
         {/* HERO */}
-        <section className="flex flex-col lg:flex-row items-center justify-between gap-8">
+        <section className="lg:relative flex flex-col items-center justify-between gap-8 lg:gap-6">
           <div className="flex flex-col gap-6">
-            <h1 className="text-[clamp(2.5rem,5vw,6rem)] uppercase font-bold text-info-text">
+            <h1 className="text-[clamp(2.5rem,5vw,6rem)] uppercase font-bold text-info-text lg:text-center">
               Explore the World of Pokémon
             </h1>
 
-            <p className="text-link">
+            <p className="text-link lg:text-lg lg:text-center">
               Search, discover, and learn every Pokémon.
             </p>
 
-            <div className="flex gap-4">
+            <div className="flex gap-4 lg:self-center">
               <Link
                 to="/pokedex"
-                className="px-6 py-4 bg-hp text-white rounded-xl hover:bg-hp transition"
+                className="lg:text-sm px-6 py-4 bg-hp text-white rounded-xl hover:bg-white hover:text-hp transition-all duration-300"
               >
                 Open Pokedex
               </Link>
 
               <Link
                 to="/dashboard"
-                className="px-6 py-4 border border-link text-info-text rounded-xl hover:bg-gray-100 transition"
+                className="lg:text-sm px-6 py-4 border border-link text-info-text rounded-xl hover:bg-info-bg hover:text-info-text hover:border-transparent transition-all duration-300"
               >
                 Open Dashboard
               </Link>
@@ -146,7 +146,7 @@ function App() {
         {/* GUESS THE POKEMON */}
         <section
           id="guess-pokemon"
-          className="bg-hp mt-20 rounded-2xl shadow-sm p-6 flex flex-col items-center gap-4"
+          className="bg-hp mt-20 lg:mt-30 rounded-2xl shadow-sm p-6 flex flex-col items-center gap-4 lg:w-120 lg:max-w-200 lg:mx-auto"
         >
           <h2 className="text-2xl font-bold">Guess the Pokemon!</h2>
 
@@ -154,7 +154,7 @@ function App() {
             <img
               src={pokemonData?.image}
               alt=""
-              className={`h-1/2 w-1/2 object-contain transition-all duration-300 ${isGuessCorrect ? 'brightness-100' : 'brightness-0'}`}
+              className={`h-1/2 w-1/2  object-contain transition-all duration-300 ${isGuessCorrect ? 'brightness-100' : 'brightness-0'}`}
             />
           </div>
 
@@ -205,9 +205,9 @@ function App() {
         </section>
 
         {/* MATCH-UPS */}
-        <section className="mt-20 flex flex-col gap-6 ">
+        <section className="mt-20 lg:mt-40 flex flex-col gap-6 lg:max-w-150 lg:mx-auto">
           <h2 className="text-2xl font-bold text-center">
-            Type Matchups Trainer
+            Type Match-Ups Trainer
           </h2>
 
           {/* BUTTONS */}
@@ -232,14 +232,21 @@ function App() {
             {[
               {
                 title: 'Strong Against',
-                typeDamage: typeDamage.strong.map((s: any, index) => (
-                  <p
-                    key={index}
-                    className={`${TYPE_COLORS[s]} p-1.5 grow rounded-md`}
-                  >
-                    {s}
-                  </p>
-                )),
+                typeDamage:
+                  typeDamage.strong.length > 0 ? (
+                    typeDamage.strong.map((s: any, index) => (
+                      <p
+                        key={index}
+                        className={`${TYPE_COLORS[s]} p-1.5 grow rounded-md`}
+                      >
+                        {s}
+                      </p>
+                    ))
+                  ) : (
+                    <p className="bg-link text-white p-1.5 rounded-md grow">
+                      None
+                    </p>
+                  ),
               },
               {
                 title: 'Weak Against',
@@ -284,7 +291,7 @@ function App() {
         </section>
 
         {/* MUSIC */}
-        <section className="mt-15 bg-linear-to-r from-type-fire to-hp text-white rounded-2xl flex flex-col gap-6 py-4 px-3">
+        <section className="lg:w-150 lg:mx-auto mt-15 lg:mt-35 bg-linear-to-r from-type-fire to-hp text-white rounded-2xl flex flex-col gap-6 py-4 px-3">
           <h2 className="text-2xl font-bold">Pokémon Music Player</h2>
 
           <div className="flex flex-col items-center gap-6 w-full">

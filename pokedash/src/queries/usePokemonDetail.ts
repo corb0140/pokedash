@@ -88,6 +88,7 @@ export function usePokemonDetail(id: number | null) {
             ?.flavor_text.replace(/\n|\f/g, ' ') ?? '',
         weaknesses,
         evolutionChain: evoArray,
+        moves: pokemon.moves.map((m: any) => m.move.name),
       }
     },
   })

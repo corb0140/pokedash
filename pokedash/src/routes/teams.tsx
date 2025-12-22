@@ -7,15 +7,23 @@ export const teamsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: 'teams',
 
-  beforeLoad: () => {
+  loader: () => {
     const user = useAuth.getState().user
-    if (!user) {
-      throw redirect({
-        to: '/login',
-        search: { redirect: location.href || '/' },
-      })
+
+    return {
+      isAuthenticated: !!user,
     }
   },
+
+  // beforeLoad: () => {
+  //   const user = useAuth.getState().user
+  //   if (!user) {
+  //     throw redirect({
+  //       to: '/login',
+  //       search: { redirect: location.href || '/' },
+  //     })
+  //   }
+  // },
 
   component: Teams,
 })

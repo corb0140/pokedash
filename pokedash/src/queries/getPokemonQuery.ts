@@ -2,6 +2,7 @@ import { QueryClient } from '@tanstack/react-query'
 import {
   getAllPokemon,
   getPokemonById,
+  getPokemonSpeciesById,
   getPokemonTypeData,
 } from '../services/pokeAPI'
 
@@ -13,6 +14,8 @@ export type PokemonProps = {
   types?: Array<string>
   abilities?: Array<string>
   weaknesses?: Array<string>
+  isLegendary?: boolean
+  isMythical?: boolean
 }
 
 export const queryClient = new QueryClient()
@@ -34,6 +37,17 @@ export async function fetchAllPokemon(
         const id = Number(item.url.split('/').at(-2))
         const res = await getPokemonById(id)
 
+        // IS LEGENDARY
+        let isLegendary = false
+
+        try {
+          const species = await getPokemonSpeciesById(id)
+          isLegendary = species.is_legendary
+        } catch (err) {
+          console.warn(`Species fetch failed for Pokémon ${id}`)
+        }
+
+        // TYPES
         const types = res.types.map(
           (t: { type: { name: string } }) => t.type.name,
         )
@@ -46,6 +60,8 @@ export async function fetchAllPokemon(
             )
           }),
         )
+
+        // WEAKNESSES
         const weaknesses = Array.from(new Set(typeResponses.flat()))
 
         return {
@@ -60,6 +76,7 @@ export async function fetchAllPokemon(
             (a: { ability: { name: string } }) => a.ability.name,
           ),
           weaknesses: weaknesses,
+          isLegendary: isLegendary,
         }
       }),
     )

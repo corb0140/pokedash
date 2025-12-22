@@ -33,5 +33,5 @@ export default function Favorites() {
     )
   }
 
-  return <>{/* Actual favorites page */}</>
+  return <>{/* Actual Favorites Page */}</>
 }

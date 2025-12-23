@@ -1,4 +1,4 @@
-import { createRoute, redirect } from '@tanstack/react-router'
+import { createRoute } from '@tanstack/react-router'
 import { rootRoute } from './__root'
 import Teams from '@/pages/teams'
 import { useAuth } from '@/stores/auth'

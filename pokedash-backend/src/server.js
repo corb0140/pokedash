@@ -12,10 +12,12 @@ app.use(cookieParser());
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 // IMPORT ROUTES
+const authRoutes = require("./routes/authRoutes");
 
 // ROUTES
+app.use("/auth", authRoutes);
 
-
+// HEALTH CHECK
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "healthy" });
 });

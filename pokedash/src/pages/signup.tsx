@@ -5,9 +5,9 @@ import type { FormEvent } from 'react'
 import Dugtrio from '@/components/Models/Dugtrio'
 import { useAuthMutations } from '@/queries/useAuth'
 
-function Login() {
+function SignUp() {
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false)
-  const { login } = useAuthMutations()
+  const { signup } = useAuthMutations()
   const formRef = useRef<HTMLFormElement>(null)
   const navigate = useNavigate()
 
@@ -17,11 +17,12 @@ function Login() {
     const formData = new FormData(e.currentTarget)
 
     const payload = {
-      identifier: formData.get('identifier') as string,
+      username: formData.get('username') as string,
+      email: formData.get('email') as string,
       password: formData.get('password') as string,
     }
 
-    login.mutate(payload, {
+    signup.mutate(payload, {
       onSuccess: () => {
         formRef.current?.reset()
 
@@ -33,9 +34,10 @@ function Login() {
   }
   return (
     <div className="p-6 lg:px-20 h-[calc(100vh-72px)] flex flex-col justify-center items-center">
-      <h2 className="uppercase text-5xl self-start">Login</h2>
+      <h2 className="uppercase text-5xl self-start">Sign Up</h2>
 
       <form
+        ref={formRef}
         action=""
         method="POST"
         onSubmit={handleSubmit}
@@ -44,16 +46,34 @@ function Login() {
         {/* USERNAME */}
         <div className="relative text-sm">
           <label
-            htmlFor="identifier"
+            htmlFor="username"
             className="absolute bg-page-background -top-2.5 left-3 px-1.5"
           >
-            Username or Email
+            Username
           </label>
           <input
             type="text"
-            name="identifier"
-            id="identifier"
+            name="username"
+            id="username"
             className="p-3.5 w-full rounded-lg border"
+            required
+          />
+        </div>
+
+        {/* EMAIL */}
+        <div className="relative text-sm mt-5">
+          <label
+            htmlFor="email"
+            className="absolute bg-page-background -top-2.5 left-3 px-1.5"
+          >
+            Email
+          </label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            className="p-3.5 w-full rounded-lg border"
+            required
           />
         </div>
 
@@ -71,6 +91,7 @@ function Login() {
             name="password"
             id="password"
             className="p-3.5 w-full rounded-lg border"
+            required
           />
 
           <div
@@ -85,19 +106,26 @@ function Login() {
           </div>
         </div>
 
+        {/* ERROR */}
+        {signup.isError && (
+          <p className="text-red-500 mt-4 text-sm">
+            {(signup.error as any)?.response?.data?.message || 'Signup failed'}
+          </p>
+        )}
+
         {/* BUTTON */}
         <button
           type="submit"
           className="self-start py-3 px-5 rounded-lg bg-hp text-white mt-10"
         >
-          Login
+          Sign Up
         </button>
 
         {/* SIGNUP */}
         <span className="mx-auto mt-10">
-          Don't have an account?{' '}
-          <Link to="/signup" className="font-bold underline">
-            signup
+          Already have an account?{' '}
+          <Link to="/login" className="font-bold underline">
+            login
           </Link>
         </span>
       </form>
@@ -107,4 +135,4 @@ function Login() {
   )
 }
 
-export default Login
+export default SignUp

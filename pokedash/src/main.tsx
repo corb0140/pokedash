@@ -16,6 +16,7 @@ import { teamsRoute } from './routes/teams.tsx'
 import { dashboardRoute } from './routes/dashbaord.tsx'
 import { profilePageRoute } from './routes/profile-page.tsx'
 import { loginRoute } from './routes/login.tsx'
+import { signupRoute } from './routes/signup.tsx'
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -27,6 +28,7 @@ const routeTree = rootRoute.addChildren([
   dashboardRoute,
   profilePageRoute,
   loginRoute,
+  signupRoute,
 ])
 
 const router = createRouter({

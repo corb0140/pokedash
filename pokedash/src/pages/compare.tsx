@@ -110,7 +110,7 @@ export default function ComparePokemon() {
           <div className="h-auto">
             <h3 className="text-2xl text-center">Stats</h3>
 
-            <div className="h-[clamp(320px,60vh,640px)]">
+            <div className="h-[40dvh] lg:h-[60dvh] mt-5">
               <ResponsiveContainer>
                 <RadarChart data={statData}>
                   <PolarGrid />

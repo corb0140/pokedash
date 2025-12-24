@@ -4,7 +4,7 @@ import { Link } from '@tanstack/react-router'
 import { Icon } from '@iconify/react'
 import NavModal from './Modals/NavModal'
 import { navLinks } from '@/data/navLinks'
-import { useAuth } from '@/stores/auth'
+import { useAuth } from '@/stores/authStore'
 
 export default function Navbar() {
   const [showModal, setShowModal] = useState<boolean>(false)
@@ -49,15 +49,19 @@ export default function Navbar() {
         {!user ? (
           <Link
             to="/login"
-            className="text-[clamp(0.7rem,1.1vw,0.875rem)] text-link font-semibold font-orbitron"
+            className="text-[clamp(0.7rem,.8vw,0.875rem)] text-link font-semibold font-orbitron"
           >
             Login
           </Link>
         ) : (
-          <Link
-            to="/profile-page"
-            className="h-20 w-20 overflow-hidden rounded-full border border-link"
-          />
+          <Link to="/profile-page" className="flex items-center gap-2">
+            <div className="h-[clamp(1.5rem,2.5vw,3.5rem)] w-[clamp(1.5rem,2.5vw,3.5rem)] overflow-hidden rounded-full border bg-active-link flex items-center justify-center text-sm font-bold text-white">
+              {user.username.charAt(0).toUpperCase()}
+            </div>
+            <span className="text-[clamp(0.7rem,1vw,0.875rem)] font-semibold">
+              {user.username}
+            </span>
+          </Link>
         )}
       </div>
 

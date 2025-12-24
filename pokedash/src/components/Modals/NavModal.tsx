@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { navLinks } from '@/data/navLinks'
-import { useAuth } from '@/stores/auth'
+import { useAuth } from '@/stores/authStore'
 
 function NavModal({ onClose }: { onClose: () => void }) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -82,8 +82,13 @@ function NavModal({ onClose }: { onClose: () => void }) {
             <Link
               to="/profile-page"
               onClick={handleClose}
-              className="h-20 w-20 overflow-hidden rounded-full border border-link"
-            />
+              className="flex flex-col items-center gap-2"
+            >
+              <div className="h-15 w-15 overflow-hidden rounded-full border bg-active-link flex items-center justify-center text-3xl font-bold text-white">
+                {user.username.charAt(0).toUpperCase()}
+              </div>
+              <span className="text-lg font-semibold">{user.username}</span>
+            </Link>
           )}
         </div>
       </div>

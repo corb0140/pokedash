@@ -59,7 +59,13 @@ const login = async (identifier, password) => {
   };
 };
 
+// DELETE ACCOUNT
+const deleteAccount = async (userId) => {
+  await pool.query(`DELETE FROM users WHERE id = $1`, [userId]);
+};
+
 module.exports = {
   signup,
   login,
+  deleteAccount,
 };

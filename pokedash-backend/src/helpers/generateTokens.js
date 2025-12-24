@@ -6,18 +6,18 @@ if (!process.env.ACCESS_TOKEN_SECRET || !process.env.REFRESH_TOKEN_SECRET) {
 
 const generateAccessToken = (user) => {
   return jwt.sign(
-    { id: user.id, email: user.email },
+    { id: user.id, email: user.email, username: user.username },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN }
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || "60m" }
   );
 };
 
 const generateRefreshToken = (user) => {
   return jwt.sign(
-    { id: user.id, email: user.email },
+    { id: user.id, email: user.email, username: user.username },
     process.env.REFRESH_TOKEN_SECRET,
     {
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || "7d",
     }
   );
 };

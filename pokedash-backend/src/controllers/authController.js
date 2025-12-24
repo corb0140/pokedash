@@ -34,6 +34,7 @@ const signup = async (req, res) => {
   }
 };
 
+// LOGIN
 const login = async (req, res) => {
   try {
     const { identifier, password } = req.body;
@@ -75,9 +76,24 @@ const logout = (req, res) => {
   res.status(200).json({ message: `Logout successful` });
 };
 
+// DELETE ACCOUNT
+const deleteAccount = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    await authService.deleteAccount(userId);
+    res.clearCookie(`accessToken`);
+    res.clearCookie(`refreshToken`);
+    res.status(200).json({ message: `Account deleted successfully` });
+  } catch (error) {
+    logger.error(`Error in deleteAccount: ${error.message}`);
+    res.status(500).json({ message: `Internal server error` });
+  }
+};
+
 module.exports = {
   signup,
   login,
   refresh,
   logout,
+  deleteAccount,
 };

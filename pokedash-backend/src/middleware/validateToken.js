@@ -1,20 +1,32 @@
 const jwt = require("jsonwebtoken");
+const pool = require("../config/db");
 
-const validateRefreshToken = (req, res) => {
+const validateRefreshToken = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
-  if (!refreshToken)
-    return res.status(401).json({ message: "No refresh token provided" });
+  if (!refreshToken) {
+    return res.status(200).json({ user: null });
+  }
 
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ message: "Invalid refresh token" });
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+    const { rows } = await pool.query("SELECT * FROM users WHERE id = $1", [
+      decoded.id,
+    ]);
+
+    if (!rows.length) {
+      res.clearCookie("refreshToken");
+      res.clearCookie("accessToken");
+      return res.status(200).json({ user: null });
+    }
+
+    const user = rows[0];
 
     const newAccessToken = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user.id, email: user.email, username: user.username },
       process.env.ACCESS_TOKEN_SECRET,
-      {
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
-      }
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || "60m" }
     );
 
     res.cookie("accessToken", newAccessToken, {
@@ -24,14 +36,14 @@ const validateRefreshToken = (req, res) => {
     });
 
     res.status(200).json({
-      user: {
-        id: user.id,
-        email: user.email,
-      },
+      user: { id: user.id, email: user.email, username: user.username },
       accessToken: newAccessToken,
-      message: "New access token generated",
     });
-  });
+  } catch (err) {
+    res.clearCookie("refreshToken");
+    res.clearCookie("accessToken");
+    return res.status(200).json({ user: null });
+  }
 };
 
 module.exports = {

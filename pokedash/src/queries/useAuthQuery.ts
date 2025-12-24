@@ -14,14 +14,12 @@ export const useAuthQuery = () => {
       return res.data
     },
     retry: false,
+    staleTime: Infinity,
   })
 
   useEffect(() => {
     if (query.isSuccess && query.data?.user) {
       setUser(query.data.user as User)
-    }
-    if (query.isError) {
-      clearUser()
     }
   }, [query.isSuccess, query.isError, query.data, setUser, clearUser])
 

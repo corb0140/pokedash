@@ -4,10 +4,9 @@ import { useAuthQuery } from '@/queries/useAuthQuery'
 
 export const rootRoute = createRootRoute({
   component: () => {
-    const { isLoading, isError } = useAuthQuery()
+    const { isLoading } = useAuthQuery()
 
     if (isLoading) return <div>Loading...</div>
-    if (isError) return <div>Error loading user</div>
 
     return (
       <div>

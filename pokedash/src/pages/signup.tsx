@@ -7,6 +7,7 @@ import { usePokemonDetail } from '@/queries/usePokemonDetail'
 
 function SignUp() {
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false)
+  const [error, setError] = useState<string>('')
   const { signup } = useAuthMutations()
   const formRef = useRef<HTMLFormElement>(null)
   const navigate = useNavigate()
@@ -33,6 +34,11 @@ function SignUp() {
       username: formData.get('username') as string,
       email: formData.get('email') as string,
       password: formData.get('password') as string,
+    }
+
+    if (payload.password.length < 6) {
+      setError('Password must be at least 6 characters')
+      return
     }
 
     signup.mutate(payload, {
@@ -120,11 +126,7 @@ function SignUp() {
         </div>
 
         {/* ERROR */}
-        {signup.isError && (
-          <p className="text-red-500 mt-4 text-sm">
-            {(signup.error as any)?.response?.data?.message || 'Signup failed'}
-          </p>
-        )}
+        {error && <p className="text-hp mt-4 text-sm">{error}</p>}
 
         {/* BUTTON */}
         <button

@@ -4,12 +4,15 @@ import { Icon } from '@iconify/react'
 import { useAuthMutations } from '@/queries/useAuth'
 import { profilePageRoute } from '@/routes/profile-page'
 import HandleDeleteModal from '@/components/Modals/HandleDeleteModal'
+import ChangePasswordModal from '@/components/Modals/ChangePasswordModal'
 import { useAuth } from '@/stores/authStore'
 
 function ProfilePage() {
   const navigate = useNavigate()
-  const { logout, deleteAccount } = useAuthMutations()
-  const [showModal, setShowModal] = useState(false)
+  const { logout, deleteAccount, changeUsername, changePassword } =
+    useAuthMutations()
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
   const user = useAuth.getState().user
   const [editingUsername, setEditingUsername] = useState(false)
   const [username, setUsername] = useState(user?.username ?? '')
@@ -96,8 +99,14 @@ function ProfilePage() {
               <button
                 className="text-info-text"
                 onClick={() => {
-                  // updateUsername.mutate({ username })
-                  setEditingUsername(false)
+                  changeUsername.mutate(
+                    { username },
+                    {
+                      onSuccess: () => {
+                        setEditingUsername(false)
+                      },
+                    },
+                  )
                 }}
               >
                 Save
@@ -133,7 +142,7 @@ function ProfilePage() {
             <span>********</span>
             <button
               className="text-active-link lg:text-sm"
-              onClick={() => console.log('Change Password')}
+              onClick={() => setShowPasswordModal(true)}
             >
               Change Password
             </button>
@@ -157,18 +166,33 @@ function ProfilePage() {
 
         <button
           className="bg-type-fire p-2 px-10 rounded-lg text-white"
-          onClick={() => setShowModal(true)}
+          onClick={() => setShowDeleteModal(true)}
         >
           Delete Account
         </button>
       </div>
 
       {/* Modal */}
-      {showModal && (
+      {showDeleteModal && (
         <HandleDeleteModal
-          onClose={() => setShowModal(false)}
+          onClose={() => setShowDeleteModal(false)}
           handleDeleteAccount={handleDeleteAccount}
           isDeleting={deleteAccount.isPending}
+        />
+      )}
+
+      {showPasswordModal && (
+        <ChangePasswordModal
+          onClose={() => setShowPasswordModal(false)}
+          onSubmit={(currentPassword, newPassword) => {
+            changePassword.mutate(
+              { currentPassword, newPassword },
+              {
+                onSuccess: () => setShowPasswordModal(false),
+              },
+            )
+          }}
+          isLoading={changePassword.isPending}
         />
       )}
     </div>

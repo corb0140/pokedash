@@ -98,6 +98,12 @@ function Login() {
           </div>
         </div>
 
+        {login.isError && (
+          <p className="text-hp mt-4 text-sm">
+            {(login.error as any)?.response?.data?.message || 'Login failed'}
+          </p>
+        )}
+
         {/* BUTTON */}
         <button
           type="submit"

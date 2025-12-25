@@ -41,6 +41,19 @@ const refreshRequest = async () => {
   return res.data
 }
 
+const changeUsernameRequest = async (data: { username: string }) => {
+  const res = await api.put('/auth/change-username', data)
+  return res.data
+}
+
+const changePasswordRequest = async (data: {
+  currentPassword: string
+  newPassword: string
+}) => {
+  const res = await api.put('/auth/change-password', data)
+  return res.data
+}
+
 /* ---------- MUTATIONS ---------- */
 
 export const useAuthMutations = () => {
@@ -81,11 +94,24 @@ export const useAuthMutations = () => {
     },
   })
 
+  const changeUsername = useMutation({
+    mutationFn: changeUsernameRequest,
+    onSuccess: (data) => {
+      setUser(data.user as User)
+    },
+  })
+
+  const changePassword = useMutation({
+    mutationFn: changePasswordRequest,
+  })
+
   return {
     signup,
     login,
     logout,
     deleteAccount,
     refresh,
+    changeUsername,
+    changePassword,
   }
 }

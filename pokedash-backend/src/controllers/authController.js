@@ -90,10 +90,52 @@ const deleteAccount = async (req, res) => {
   }
 };
 
+// CHANGE USERNAME
+const changeUsername = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { username } = req.body;
+
+    if (!username) {
+      return res.status(400).json({ message: "Username is required" });
+    }
+
+    const updatedUser = await authService.changeUsername(userId, username);
+
+    res.status(200).json({
+      message: "Username updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    logger.error(`Error in changeUsername: ${error.message}`);
+
+    if (error.message === "Username already taken") {
+      return res.status(400).json({ message: error.message });
+    }
+
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// CHANGE PASSWORD
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { currentPassword, newPassword } = req.body;
+    await authService.changePassword(userId, currentPassword, newPassword);
+    res.status(200).json({ message: `Password changed successfully` });
+  } catch (error) {
+    logger.error(`Error in changePassword: ${error.message}`);
+    res.status(500).json({ message: `Internal server error` });
+  }
+};
+
 module.exports = {
   signup,
   login,
   refresh,
   logout,
   deleteAccount,
+  changeUsername,
+  changePassword,
 };

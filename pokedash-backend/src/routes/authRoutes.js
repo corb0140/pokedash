@@ -5,6 +5,8 @@ const {
   refresh,
   logout,
   deleteAccount,
+  changeUsername,
+  changePassword,
 } = require("../controllers/authController");
 const { authenticate } = require("../middleware/authMiddleware");
 
@@ -15,5 +17,7 @@ router.post("/login", login);
 router.post("/refresh", refresh);
 router.post("/logout", logout);
 router.delete("/delete-account", authenticate, deleteAccount);
+router.put("/change-username", authenticate, changeUsername);
+router.put("/change-password", authenticate, changePassword);
 
 module.exports = router;

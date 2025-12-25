@@ -5,7 +5,10 @@ const validateRefreshToken = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
   if (!refreshToken) {
-    return res.status(200).json({ user: null });
+    return res.status(200).json({
+      authenticated: false,
+      user: null,
+    });
   }
 
   try {

@@ -1,9 +1,9 @@
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import type { FormEvent } from 'react'
-import Dugtrio from '@/components/Models/Dugtrio'
 import { useAuthMutations } from '@/queries/useAuth'
+import { usePokemonDetail } from '@/queries/usePokemonDetail'
 
 function SignUp() {
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false)
@@ -11,6 +11,19 @@ function SignUp() {
   const formRef = useRef<HTMLFormElement>(null)
   const navigate = useNavigate()
 
+  // GHOST POKEMON
+  const { data: ghostData } = usePokemonDetail(429)
+  const [isVisible, setIsVisible] = useState(true)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsVisible((prev) => !prev)
+    }, 4000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // HANDLE SUBMIT
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
@@ -33,21 +46,21 @@ function SignUp() {
     console.log('submitted')
   }
   return (
-    <div className="p-6 lg:px-20 h-[calc(100vh-72px)] flex flex-col justify-center items-center">
-      <h2 className="uppercase text-5xl self-start">Sign Up</h2>
+    <div className="p-6 lg:px-20 h-[calc(100vh-72px)] lg:h-[calc(100vh-86px)] flex flex-col justify-center items-center">
+      <h2 className="uppercase text-5xl self-start lg:self-center">Sign Up</h2>
 
       <form
         ref={formRef}
         action=""
         method="POST"
         onSubmit={handleSubmit}
-        className="w-full mt-10 py-5 flex flex-col"
+        className="w-full lg:w-1/3 mt-10 py-5 flex flex-col"
       >
         {/* USERNAME */}
         <div className="relative text-sm">
           <label
             htmlFor="username"
-            className="absolute bg-page-background -top-2.5 left-3 px-1.5"
+            className="absolute rounded-full bg-page-background -top-2.5 left-3 px-1.5"
           >
             Username
           </label>
@@ -55,7 +68,7 @@ function SignUp() {
             type="text"
             name="username"
             id="username"
-            className="p-3.5 w-full rounded-lg border"
+            className="p-3.5 w-full rounded-lg bg-page-background border"
             required
           />
         </div>
@@ -64,7 +77,7 @@ function SignUp() {
         <div className="relative text-sm mt-5">
           <label
             htmlFor="email"
-            className="absolute bg-page-background -top-2.5 left-3 px-1.5"
+            className="absolute rounded-full bg-page-background -top-2.5 left-3 px-1.5"
           >
             Email
           </label>
@@ -72,7 +85,7 @@ function SignUp() {
             type="email"
             name="email"
             id="email"
-            className="p-3.5 w-full rounded-lg border"
+            className="p-3.5 w-full rounded-lg bg-page-background border"
             required
           />
         </div>
@@ -81,7 +94,7 @@ function SignUp() {
         <div className="relative text-sm mt-5">
           <label
             htmlFor="password"
-            className="absolute bg-page-background -top-2.5 left-3 px-1.5"
+            className="absolute rounded-full bg-page-background -top-2.5 left-3 px-1.5"
           >
             Password
           </label>
@@ -90,7 +103,7 @@ function SignUp() {
             type={isPasswordVisible ? 'text' : 'password'}
             name="password"
             id="password"
-            className="p-3.5 w-full rounded-lg border"
+            className="p-3.5 w-full rounded-lg bg-page-background border"
             required
           />
 
@@ -130,7 +143,14 @@ function SignUp() {
         </span>
       </form>
 
-      <Dugtrio />
+      {/* GHOST POKEMON */}
+      {ghostData && (
+        <img
+          src={ghostData.image}
+          alt="Haunter"
+          className={`absolute top-5 lg:top-20 right-8 lg:right-50 -z-10 w-40 h-40 lg:h-75 lg:w-75 transition-opacity duration-2000 ${isVisible ? '' : 'opacity-0'}`}
+        />
+      )}
     </div>
   )
 }

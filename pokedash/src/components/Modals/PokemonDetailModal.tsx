@@ -255,7 +255,7 @@ export default function PokemonDetailModal({
                     </div>
 
                     {/* VALUE */}
-                    <span className="">{s.baseStat}</span>
+                    <span className="">{s.value}</span>
                   </div>
                 </div>
               )

@@ -14,7 +14,7 @@ function NavModal({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     gsap.fromTo(
       containerRef.current,
-      { x: 100, opacity: 0 },
+      { x: 200, opacity: 0 },
       {
         x: 0,
         opacity: 1,
@@ -35,11 +35,17 @@ function NavModal({ onClose }: { onClose: () => void }) {
         ease: 'power2.out',
       },
     )
+
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = 'auto'
+    }
   }, [])
 
   const handleClose = () => {
     gsap.to(containerRef.current, {
-      x: 100,
+      x: 200,
       opacity: 0,
       duration: 0.5,
       ease: 'power1.inOut',
@@ -50,7 +56,7 @@ function NavModal({ onClose }: { onClose: () => void }) {
   return (
     <div
       ref={containerRef}
-      className="fixed top-0 p-5 right-0 min-h-screen w-1/2 bg-info-bg flex justify-center z-30"
+      className="fixed top-0 p-5 right-0 h-dvh w-full bg-info-bg flex justify-center z-30"
     >
       <span onClick={handleClose} className="absolute top-5 right-5 text-lg">
         {closeText.map((letter, index) => (

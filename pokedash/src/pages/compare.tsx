@@ -17,6 +17,7 @@ import {
 import { usePokemonDetail } from '@/queries/usePokemonDetail'
 import { usePokemonList } from '@/queries/usePokemonList'
 import PokemonSearch from '@/components/PokemonSearch'
+import Loading from '@/components/Loading'
 
 export default function ComparePokemon() {
   const P1_COLOR = 'hsl(200, 70%, 50%)'
@@ -32,7 +33,7 @@ export default function ComparePokemon() {
     query: '',
   })
 
-  const { data: pokemonList } = usePokemonList(1, 1350)
+  const { data: pokemonList, isLoading } = usePokemonList(1, 1350)
   const { data: pokemon1 } = usePokemonDetail(p1.id)
   const { data: pokemon2 } = usePokemonDetail(p2.id)
 
@@ -69,6 +70,10 @@ export default function ComparePokemon() {
     p1: pokemon1?.weaknesses.includes(type) ? 2 : 1,
     p2: pokemon2?.weaknesses.includes(type) ? 2 : 1,
   }))
+
+  if (isLoading) {
+    return <Loading text="Loading Pokemon Data" />
+  }
 
   return (
     <div className="p-4 grid gap-6 mt-5">

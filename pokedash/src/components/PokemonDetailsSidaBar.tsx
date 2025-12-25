@@ -168,7 +168,7 @@ export default function PokemonDetailsSideBar() {
                   </div>
 
                   {/* VALUE */}
-                  <span className="">{s.baseStat}</span>
+                  <span className="">{s.value}</span>
                 </div>
               </div>
             )

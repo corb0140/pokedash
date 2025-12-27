@@ -77,6 +77,8 @@ export default function ComparePokemon() {
 
   return (
     <div className="p-4 grid gap-6 mt-5">
+      <h2 className="uppercase text-4xl lg:hidden">Compare</h2>
+
       {/* SELECTORS */}
       <div className="grid grid-cols-2 gap-4 place-items-center">
         <div className="flex gap-4 items-center col-span-2">

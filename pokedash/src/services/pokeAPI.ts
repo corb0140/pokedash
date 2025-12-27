@@ -51,3 +51,21 @@ export async function getAllPokemonTypes() {
     console.error('Error fetching pokemon: ', error)
   }
 }
+
+export async function getAllAbilities() {
+  try {
+    const res = await pokeApi.get(ApiEndpoints.GET_ALL_ABILITIES)
+    return res.data
+  } catch (error) {
+    console.error('Error fetching ability data: ', error)
+  }
+}
+
+export async function getPokemonLocationsById(id: number) {
+  try {
+    const res = await pokeApi.get(ApiEndpoints.GET_POKEMON_LOCATIONS_BY_ID(id))
+    return res.data
+  } catch (error) {
+    console.error('Error fetching pokemon locations: ', error)
+  }
+}

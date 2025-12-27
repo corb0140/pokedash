@@ -21,7 +21,9 @@ function Dashboard() {
 
   return (
     <div className="p-6 lg:px-20">
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+      <h2 className="uppercase text-4xl lg:hidden">Dashboard</h2>
+
+      <div className="not-lg:mt-10 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
         <StatTile label="Total Pokémon" value={totalPokemon} />
         <StatTile label="Legendaries" value={legendaryCount} />
         <StatTile

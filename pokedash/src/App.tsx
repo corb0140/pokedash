@@ -105,11 +105,11 @@ function App() {
         <section className="lg:relative flex flex-col items-center justify-between gap-8 lg:gap-6">
           <div className="flex flex-col gap-6">
             <h1 className="text-[clamp(2.5rem,5vw,6rem)] uppercase font-bold text-info-text lg:text-center">
-              Explore the World of Pokémon
+              Explore the World of Pokemon
             </h1>
 
             <p className="text-link lg:text-lg lg:text-center">
-              Search, discover, and learn every Pokémon.
+              Search, discover, and learn every Pokemon.
             </p>
 
             <div className="flex gap-4 lg:self-center">

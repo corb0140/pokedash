@@ -22,7 +22,7 @@ type PokemonStore = {
 }
 
 export const usePokemonStore = create<PokemonStore>((set) => ({
-  selectedId: 1,
+  selectedId: null,
   isModalOpen: false,
 
   filters: {

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { pokemonKeys } from './pokemonKeys'
 import {
   getPokemonById,
+  getPokemonLocationsById,
   getPokemonSpeciesById,
   getPokemonTypeData,
 } from '@/services/pokeAPI'
@@ -13,7 +14,9 @@ export function usePokemonDetail(id: number | null) {
     queryFn: async () => {
       const pokemon = await getPokemonById(id!)
       const species = await getPokemonSpeciesById(id!)
+      const locations = await getPokemonLocationsById(id!)
 
+      // TYPES
       const types = pokemon.types.map((t: any) => t.type.name)
 
       //   WEAKNESSES
@@ -65,6 +68,11 @@ export function usePokemonDetail(id: number | null) {
         current = current.evolves_to[0]
       }
 
+      // LOCATIONS
+      const encounterLocations = locations.map((l: any) =>
+        l.location_area.name.replace(/-/g, ' '),
+      )
+
       return {
         id: pokemon.id,
         name: pokemon.name,
@@ -89,6 +97,10 @@ export function usePokemonDetail(id: number | null) {
         weaknesses,
         evolutionChain: evoArray,
         moves: pokemon.moves.map((m: any) => m.move.name),
+        locations: encounterLocations,
+        shiny: pokemon.sprites.front_shiny,
+        cries: pokemon.cries.latest || pokemon.cries.legacy,
+        catchRate: Math.round((species.capture_rate / 255) * 100),
       }
     },
   })

@@ -9,4 +9,6 @@ export const ApiEndpoints = {
   GET_POKEMON_TYPE_DATA: (type: string) =>
     `https://pokeapi.co/api/v2/type/${type}`,
   GET_ALL_POKEMON_TYPES: 'https://pokeapi.co/api/v2/type',
+  GET_ALL_ABILITIES: 'https://pokeapi.co/api/v2/ability?limit=10000&offset=0',
+  GET_POKEMON_LOCATIONS_BY_ID: (id: number) => `pokemon/${id}/encounters`,
 }

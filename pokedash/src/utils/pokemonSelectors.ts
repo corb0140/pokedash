@@ -1,12 +1,4 @@
-export type PokemonProps = {
-  id?: number
-  image?: string
-  name?: string
-  order?: number
-  types?: Array<string>
-  abilities?: Array<string>
-  weaknesses?: Array<string>
-}
+import type { PokemonProps } from '@/queries/getPokemonQuery'
 
 export function filterPokemon(
   pokemon: Array<PokemonProps>,

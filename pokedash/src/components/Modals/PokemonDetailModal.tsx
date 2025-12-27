@@ -1,5 +1,6 @@
 import gsap from 'gsap'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import { Link } from '@tanstack/react-router'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { PokemonProps } from '@/queries/getPokemonQuery'
 import { usePokemonStore } from '@/stores/pokemonStore'
@@ -7,7 +8,7 @@ import { usePokemonDetail } from '@/queries/usePokemonDetail'
 import { TYPE_ICONS } from '@/constants/typeIcons'
 import { STATS } from '@/constants/stats'
 import { TYPE_COLORS } from '@/constants/typeColors'
-import { getPokemonById } from '@/services/pokeAPI'
+import { usePokemonNextPrev } from '@/hooks/usePokemonNextPrev'
 
 export type PokemonDetailModalProps = PokemonProps & {
   onClose?: () => void
@@ -24,15 +25,8 @@ export default function PokemonDetailModal({
   const lettersRef = useRef<Array<HTMLSpanElement>>([])
 
   const closeText = [...'close']
-
-  const [prevPokemon, setPrevPokemon] = useState<{
-    name: string
-    image: string
-  } | null>(null)
-  const [nextPokemon, setNextPokemon] = useState<{
-    name: string
-    image: string
-  } | null>(null)
+  const { prevPokemon, handlePrev, nextPokemon, handleNext } =
+    usePokemonNextPrev(selectedId, setSelectedId)
 
   // STOP SCROLL
   useEffect(() => {
@@ -85,49 +79,6 @@ export default function PokemonDetailModal({
       ease: 'power1.Out',
       onComplete: onClose,
     })
-  }
-
-  // FETCH NEXT & PREVIOUS POKEMON DATA
-  useEffect(() => {
-    async function fetchData() {
-      if (!selectedId) return
-
-      try {
-        if (selectedId > 1) {
-          const prev = await getPokemonById(selectedId - 1)
-          setPrevPokemon({
-            name: prev.name,
-            image: prev.sprites.other.showdown.front_default,
-          })
-        } else {
-          setPrevPokemon(null)
-        }
-
-        if (selectedId < 1350) {
-          const next = await getPokemonById(selectedId + 1)
-          setNextPokemon({
-            name: next.name,
-            image: next.sprites.other.showdown.front_default,
-          })
-        } else {
-          setNextPokemon(null)
-        }
-      } catch (error) {
-        console.error('Error fetching Pokémon data:', error)
-      }
-    }
-
-    fetchData()
-  }, [selectedId])
-
-  const handlePrev = () => {
-    if (!selectedId) return
-    if (selectedId > 1) setSelectedId(selectedId - 1)
-  }
-
-  const handleNext = () => {
-    if (!selectedId) return
-    if (selectedId < 1350) setSelectedId(selectedId + 1)
   }
 
   return (
@@ -338,6 +289,19 @@ export default function PokemonDetailModal({
             {nextPokemon && <ChevronRight className="h-5 w-5" />}
           </button>
         </div>
+
+        {/* LINK TO POKEMON DETAILS PAGE */}
+        {selectedId && (
+          <div className="w-full flex">
+            <Link
+              className="inline-flex mx-auto mt-5 py-2.5 px-6 bg-info-text text-white rounded-lg text-sm"
+              to="/$pokemonId"
+              params={{ pokemonId: String(selectedId) }}
+            >
+              View More Details
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )

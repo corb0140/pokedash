@@ -2,7 +2,7 @@ import { Icon } from '@iconify/react'
 import { useEffect, useState } from 'react'
 import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import PokemonDetailModal from '@/components/Modals/PokemonDetailModal'
-import PokemonDetailsSideBar from '@/components/PokemonDetailsSidaBar'
+import PokemonDetailsCard from '@/components/PokemonDetailsCard'
 import { TYPE_COLORS } from '@/constants/typeColors'
 import { filterPokemon } from '@/utils/pokemonSelectors'
 import { usePokemonList } from '@/queries/usePokemonList'
@@ -38,6 +38,7 @@ function Pokedex() {
     new Set(pokemonData.flatMap((p) => p.abilities ?? [])),
   )
 
+  // MOBILE CHECK
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024)
@@ -49,6 +50,7 @@ function Pokedex() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
+  // RANGES
   function applyRange() {
     const newFrom = Math.max(1, Math.min(fromInput, toInput))
     const newTo = Math.max(newFrom, toInput)
@@ -61,8 +63,10 @@ function Pokedex() {
   return (
     <div className="overflow-hidden lg:h-[calc(100vh-86px)]">
       <div className="mt-5 lg:mt-4 grid grid-cols-1 lg:grid-cols-6 lg:grid-rows-[auto_auto_1fr] lg:gap-4 p-6 lg:px-20">
+        <h2 className="uppercase text-4xl lg:hidden">Pokedex</h2>
+
         {/* SEARCH BAR */}
-        <div className="relative bg-white rounded-xl overflow-hidden flex items-center lg:col-span-4">
+        <div className="not-lg:mt-10 relative bg-white rounded-xl overflow-hidden flex items-center lg:col-span-4">
           <input
             type="text"
             className="p-5 lg:p-3 shadow-[4px_4px_15px_rgba(0,0,0,0.1)] w-full"
@@ -81,7 +85,7 @@ function Pokedex() {
 
         {/* POKEMON MODAL */}
         <div className="lg:col-span-2 lg:row-span-6 hidden lg:block">
-          <PokemonDetailsSideBar />
+          <PokemonDetailsCard styles="relative h-[81vh] w-full bg-white overflow-y-scroll no-scrollbar rounded-2xl py-6 px-5 shadow-[-2px_0_10px_rgba(0,0,0,0.1)]" />
         </div>
 
         {/* FILTERS */}
@@ -177,7 +181,7 @@ function Pokedex() {
                 <option value="">Ability</option>
                 {allAbilities.map((a: any) => (
                   <option key={a} value={a}>
-                    {a}
+                    {a.replace('-', ' ')}
                   </option>
                 ))}
               </select>
@@ -189,8 +193,8 @@ function Pokedex() {
         <div className="lg:col-span-4">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center mt-10 h-[50vh]">
-              <Loader2 className="animate-loader h-16 w-16 text-red-500" />
-              <p className="mt-4 text-lg">Loading Pokémon...</p>
+              <Loader2 className="animate-loader h-16 w-16 text-hp" />
+              <p className="mt-4 text-lg">Loading Pokémon</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mt-10 lg:mt-5 lg:px-1 lg:h-[55vh] lg:overflow-y-scroll">

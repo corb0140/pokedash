@@ -13,9 +13,11 @@ app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 // IMPORT ROUTES
 const authRoutes = require("./routes/authRoutes");
+const favoritesRoutes = require("./routes/favoritesRoutes");
 
 // ROUTES
 app.use("/auth", authRoutes);
+app.use("/favorites", favoritesRoutes);
 
 // HEALTH CHECK
 app.get("/health", (req, res) => {

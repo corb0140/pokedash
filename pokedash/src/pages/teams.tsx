@@ -15,6 +15,7 @@ export default function Teams() {
   const { isAuthenticated } = teamsRoute.useLoaderData()
   const { data: teams, isLoading } = useTeamsQuery()
   const { deleteTeam } = useTeamsMutations()
+  const [teamToDelete, setTeamToDelete] = useState<string | null>(null)
 
   // AUTH REDIRECT
   useEffect(() => {
@@ -114,7 +115,10 @@ export default function Teams() {
               <h3 className="uppercase tracking-wide text-lg">{team.name}</h3>
 
               <button
-                onClick={() => setIsDeleteModalOpen(true)}
+                onClick={() => {
+                  setTeamToDelete(team.id)
+                  setIsDeleteModalOpen(true)
+                }}
                 className="text-hp hover:scale-110 transition"
               >
                 <Trash2Icon className="h-5 w-5" />
@@ -165,7 +169,12 @@ export default function Teams() {
           <HandleDeleteModal
             isDeleting={deleteTeam.isPending}
             onClose={() => setIsDeleteModalOpen(false)}
-            onConfirm={() => handleDeleteTeam(teams![0].id)}
+            onConfirm={() => {
+              if (teamToDelete) {
+                handleDeleteTeam(teamToDelete)
+                setTeamToDelete(null)
+              }
+            }}
             title="Delete Team"
             message="Are you sure you want to delete this team? This action cannot be undone."
           />

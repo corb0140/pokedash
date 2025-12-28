@@ -14,7 +14,6 @@ const addFavorite = async (req, res) => {
     res.status(201).json(favorite);
   } catch (error) {
     if (error.code === "23505") {
-      // unique constraint violation
       return res.status(409).json({ message: "Pokemon already in favorites" });
     }
     res.status(500).json({ message: "Failed to add favorite" });

@@ -32,7 +32,6 @@ const getUserFavorites = async (userId) => {
     SELECT pokemon_id, created_at
     FROM favorites
     WHERE user_id = $1
-    ORDER BY created_at DESC
   `;
 
   const { rows } = await pool.query(query, [userId]);

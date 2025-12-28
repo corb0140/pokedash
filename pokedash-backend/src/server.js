@@ -14,10 +14,12 @@ app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 // IMPORT ROUTES
 const authRoutes = require("./routes/authRoutes");
 const favoritesRoutes = require("./routes/favoritesRoutes");
+const teamsRoutes = require("./routes/teamsRoutes");
 
 // ROUTES
 app.use("/auth", authRoutes);
 app.use("/favorites", favoritesRoutes);
+app.use("/teams", teamsRoutes);
 
 // HEALTH CHECK
 app.get("/health", (req, res) => {

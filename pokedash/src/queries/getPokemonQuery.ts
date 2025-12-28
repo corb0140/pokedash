@@ -22,7 +22,7 @@ export const queryClient = new QueryClient()
 
 export async function fetchAllPokemon(
   from = 1,
-  to = 1350,
+  to = 1025,
 ): Promise<Array<PokemonProps>> {
   const list = await getAllPokemon()
   const batch = list.slice(from - 1, to)
@@ -86,7 +86,7 @@ export async function fetchAllPokemon(
   return results
 }
 
-export function prefetchPokemonData(from = 1, to = 1350) {
+export function prefetchPokemonData(from = 1, to = 1025) {
   return queryClient.prefetchQuery({
     queryKey: ['pokemon', from, to],
     queryFn: () => fetchAllPokemon(from, to),

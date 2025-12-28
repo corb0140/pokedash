@@ -11,7 +11,7 @@ import { usePokemonStore } from '@/stores/pokemonStore'
 function Pokedex() {
   const [isMobile, setIsMobile] = useState(false)
   const [from, setFrom] = useState(1)
-  const [to, setTo] = useState(1350)
+  const [to, setTo] = useState(1025)
   const [fromInput, setFromInput] = useState(from)
   const [toInput, setToInput] = useState(to)
 

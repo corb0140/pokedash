@@ -176,8 +176,10 @@ function ProfilePage() {
       {showDeleteModal && (
         <HandleDeleteModal
           onClose={() => setShowDeleteModal(false)}
-          handleDeleteAccount={handleDeleteAccount}
+          onConfirm={handleDeleteAccount}
           isDeleting={deleteAccount.isPending}
+          title="Delete Account"
+          message="Are you sure you want to delete your account? This action cannot be undone."
         />
       )}
 

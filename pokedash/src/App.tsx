@@ -11,7 +11,7 @@ import { formatTime } from '@/utils/formatTime'
 
 function App() {
   const [randomPokemon, setRandomPokemon] = useState(
-    () => Math.floor(Math.random() * 1350) + 1,
+    () => Math.floor(Math.random() * 1025) + 1,
   )
   const { data: pokemonData } = usePokemonDetail(randomPokemon)
   const [input, setInput] = useState<string>('')

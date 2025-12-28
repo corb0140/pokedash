@@ -1,15 +1,19 @@
 import { useModalAnimation } from '@/hooks/useModalAnimation'
 
 export type DeleteModalProps = {
-  handleDeleteAccount: () => void
+  onConfirm: () => void
   onClose: () => void
   isDeleting?: boolean
+  title?: string
+  message?: string
 }
 
 function HandleDeleteModal({
-  handleDeleteAccount,
+  onConfirm,
   onClose,
   isDeleting,
+  title,
+  message,
 }: DeleteModalProps) {
   const { modalRef, handleCloseModal } = useModalAnimation(onClose)
 
@@ -19,10 +23,10 @@ function HandleDeleteModal({
       className="fixed inset-0 w-full h-full bg-page-background/70 flex items-center justify-center z-50"
     >
       <div className="bg-white p-6 rounded-lg w-80 shadow-sm mx-auto">
-        <h2 className="text-lg font-bold mb-4">Delete Account</h2>
+        <h2 className="text-lg font-bold mb-4">{title}</h2>
         <p className="mb-6">
-          Are you sure you want to delete your account? This action cannot be
-          undone.
+          {message ??
+            'Are you sure you want to continue with this action? This action cannot be undone.'}
         </p>
         <div className="flex justify-end gap-2">
           <button
@@ -35,7 +39,7 @@ function HandleDeleteModal({
           <button
             disabled={isDeleting}
             className="px-4 py-2 rounded bg-hp text-white"
-            onClick={handleDeleteAccount}
+            onClick={onConfirm}
           >
             {isDeleting ? 'Deleting…' : 'Delete'}
           </button>

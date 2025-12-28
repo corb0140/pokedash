@@ -30,7 +30,7 @@ export function usePokemonNextPrev(
           setPrevPokemon(null)
         }
 
-        if (selectedId < 1350) {
+        if (selectedId < 1025) {
           const next = await getPokemonById(selectedId + 1)
           setNextPokemon({
             name: next.name,
@@ -54,7 +54,7 @@ export function usePokemonNextPrev(
 
   const handleNext = () => {
     if (!selectedId) return
-    if (selectedId < 1350) setSelectedId(selectedId + 1)
+    if (selectedId < 1025) setSelectedId(selectedId + 1)
   }
 
   return { prevPokemon, handlePrev, nextPokemon, handleNext }

@@ -119,6 +119,7 @@ export default function Favorites() {
     }
   }, [isAuthenticated, navigate])
 
+  // NOT AUTHENTICATED UI
   if (!isAuthenticated) {
     return (
       <div className="h-[85vh] flex items-center justify-center">
@@ -132,9 +133,10 @@ export default function Favorites() {
     )
   }
 
+  // LOADING UI
   if (isLoading) {
     return (
-      <div className="h-[85vh] border flex flex-col gap-3 items-center justify-center">
+      <div className="h-[85vh] flex flex-col gap-3 items-center justify-center">
         <Loader2 className="animate-loader h-10 w-10 text-hp" />
         <p>Loading your favorite Pokémon</p>
       </div>

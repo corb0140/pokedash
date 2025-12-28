@@ -1,6 +1,6 @@
 import { usePokemonList } from '@/queries/usePokemonList'
 
-export function usePokemonDashboardData(from = 1, to = 1350) {
+export function usePokemonDashboardData(from = 1, to = 1025) {
   const { data = [], isLoading } = usePokemonList(from, to)
 
   const totalPokemon = data.length
@@ -33,7 +33,7 @@ export function usePokemonDashboardData(from = 1, to = 1350) {
     { gen: 'Gen 3', from: 252, to: 386 },
     { gen: 'Gen 4', from: 387, to: 493 },
     { gen: 'Gen 5', from: 494, to: 649 },
-    { gen: 'Gen 6+', from: 650, to: 1350 },
+    { gen: 'Gen 6+', from: 650, to: 1025 },
   ]
 
   const pokemonByGeneration = generationRanges.map((g) => ({

@@ -7,6 +7,7 @@ import { TYPE_COLORS } from '@/constants/typeColors'
 import { filterPokemon } from '@/utils/pokemonSelectors'
 import { usePokemonList } from '@/queries/usePokemonList'
 import { usePokemonStore } from '@/stores/pokemonStore'
+import SearchBar from '@/components/SearchBar'
 
 function Pokedex() {
   const [isMobile, setIsMobile] = useState(false)
@@ -67,20 +68,10 @@ function Pokedex() {
 
         {/* SEARCH BAR */}
         <div className="not-lg:mt-10 relative bg-white rounded-xl overflow-hidden flex items-center lg:col-span-4">
-          <input
-            type="text"
-            className="p-5 lg:p-3 shadow-[4px_4px_15px_rgba(0,0,0,0.1)] w-full"
-            placeholder="Search your pokemon!"
+          <SearchBar
             value={filters.search}
-            onChange={(e) => setFilter('search', e.target.value)}
+            onChange={(value) => setFilter('search', value)}
           />
-
-          <div className="absolute right-4 flex items-center justify-center h-8 w-8 lg:h-6 lg:w-6 rounded-xl bg-active-link shadow-[0_0_20px_hsl(3,88%,64%)]">
-            <Icon
-              icon="mynaui:pokeball-solid"
-              className="text-white h-4 w-4 lg:h-3 lg:w-3 relative"
-            />
-          </div>
         </div>
 
         {/* POKEMON MODAL */}
@@ -205,7 +196,7 @@ function Pokedex() {
                     openModal()
                   }}
                   key={data.id}
-                  className="bg-white shadow-sm rounded-lg px-5 py-10 lg:py-4 flex flex-col gap-2 items-center relative lg:max-h-80"
+                  className="bg-white shadow-sm rounded-lg px-5 py-10 lg:py-4 flex flex-col gap-2 items-center relative lg:h-fit"
                 >
                   <div>
                     <img

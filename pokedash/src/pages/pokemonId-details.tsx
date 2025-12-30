@@ -19,11 +19,13 @@ function PokemonDetails() {
   )
 
   return (
-    <div className="p-6 lg:px-20 relative">
+    <div className="p-6 lg:w-[clamp(0rem,50vw,60vw)] mx-auto relative">
       <div className="flex justify-between top-2 w-full mb-10">
         {/* BACK BUTTON */}
         <button onClick={() => router.history.back()}>
-          <span className="font-bold text-link">Back</span>
+          <span className="font-bold text-link lg:text-lg lg:uppercase">
+            Back
+          </span>
         </button>
 
         <button

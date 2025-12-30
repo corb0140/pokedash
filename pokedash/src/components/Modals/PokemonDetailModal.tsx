@@ -260,7 +260,7 @@ export default function PokemonDetailModal({
                 <img
                   src={prevPokemon.image}
                   alt={prevPokemon.name}
-                  className="h-5 w-5 object-contain"
+                  className="h-10 w-10 object-contain"
                 />
 
                 <span className="capitalize">{prevPokemon.name}</span>
@@ -282,7 +282,7 @@ export default function PokemonDetailModal({
                 <img
                   src={nextPokemon.image}
                   alt={nextPokemon.name}
-                  className="h-5 w-5 object-contain"
+                  className="h-10 w-10 object-contain"
                 />
               </>
             )}

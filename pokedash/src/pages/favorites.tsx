@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, Loader2, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Icon } from '@iconify/react'
@@ -13,6 +13,7 @@ import {
   getPokemonTypeData,
 } from '@/services/pokeAPI'
 import { useFavoritesQuery } from '@/queries/useFavoritesQuery'
+import SearchBar from '@/components/SearchBar'
 
 export default function Favorites() {
   const navigate = useNavigate()
@@ -150,20 +151,10 @@ export default function Favorites() {
 
         {/* SEARCH */}
         <div className="not-lg:mt-10 lg:col-span-4 relative bg-white rounded-xl overflow-hidden flex items-center">
-          <input
-            type="text"
-            className="p-5 lg:p-3 shadow-[4px_4px_15px_rgba(0,0,0,0.1)] w-full"
-            placeholder="Search your pokemon!"
+          <SearchBar
             value={filters.search}
-            onChange={(e) => setFilter('search', e.target.value)}
+            onChange={(value) => setFilter('search', value)}
           />
-
-          <div className="absolute right-4 flex items-center justify-center h-8 w-8 lg:h-6 lg:w-6 rounded-xl bg-active-link shadow-[0_0_20px_hsl(3,88%,64%)]">
-            <Icon
-              icon="mynaui:pokeball-solid"
-              className="text-white h-4 w-4 lg:h-3 lg:w-3 relative"
-            />
-          </div>
         </div>
 
         {/* FILTERS */}
@@ -250,7 +241,7 @@ export default function Favorites() {
                     setSelectedId(data.id ?? 1)
                   }}
                   key={data.id}
-                  className="bg-white shadow-sm rounded-lg px-5 py-10 lg:py-4 flex flex-col gap-2 items-center relative lg:max-h-80"
+                  className="bg-white shadow-sm rounded-lg px-5 py-10 lg:py-4 flex flex-col gap-2 items-center relative lg:h-fit"
                 >
                   <div>
                     <img

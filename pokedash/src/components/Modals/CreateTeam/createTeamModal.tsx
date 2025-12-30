@@ -13,6 +13,9 @@ import type { DragEndEvent } from '@dnd-kit/core'
 import { usePokemonList } from '@/queries/usePokemonList'
 import { useTeamsMutations } from '@/queries/useTeamsQuery'
 import { useModalAnimation } from '@/hooks/useModalAnimation'
+import SearchBar from '@/components/SearchBar'
+import { usePokemonStore } from '@/stores/pokemonStore'
+import { filterPokemon } from '@/utils/pokemonSelectors'
 
 interface Props {
   isOpen: boolean
@@ -21,11 +24,13 @@ interface Props {
 
 export function CreateTeamModal({ isOpen, onClose }: Props) {
   const { createTeam } = useTeamsMutations()
-  const { data: pokemonData, isLoading } = usePokemonList(1, 1350)
+  const { data: pokemonData = [], isLoading } = usePokemonList(1, 1025)
   const [teamName, setTeamName] = useState('')
   const [slots, setSlots] = useState<Array<number | null>>(Array(6).fill(null))
   const { modalRef, handleCloseModal } = useModalAnimation(onClose)
   const canSubmit = teamName.trim().length > 0 && slots.every(Boolean)
+  const { filters, setFilter } = usePokemonStore()
+  const filteredPokemon = filterPokemon(pokemonData, filters)
 
   if (!isOpen) return null
 
@@ -123,14 +128,22 @@ export function CreateTeamModal({ isOpen, onClose }: Props) {
                   key={index}
                   index={index}
                   onRemove={() => removePokemon(index)}
-                  pokemon={pokemonData?.find((p) => p.id === pokemonId)}
+                  pokemon={pokemonData.find((p) => p.id === pokemonId)}
                 />
               ))}
             </div>
 
+            {/* SEARCH BAR */}
+            <div className="mb-6 lg:col-span-4 relative bg-white shadow-sm rounded-xl overflow-hidden flex items-center">
+              <SearchBar
+                value={filters.search}
+                onChange={(value) => setFilter('search', value)}
+              />
+            </div>
+
             {/* POKEMON POOL */}
             <div className="max-h-72 overflow-y-auto no-scrollbar grid grid-cols-4 md:grid-cols-6 gap-3">
-              {pokemonData?.map((pokemon) => (
+              {filteredPokemon.map((pokemon) => (
                 <DraggablePokemon
                   key={pokemon.id}
                   pokemon={pokemon}

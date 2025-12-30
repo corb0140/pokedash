@@ -131,14 +131,6 @@ export default function Teams() {
                 <PokemonCard key={pokemon_id} pokemonId={pokemon_id} />
               ))}
             </div>
-
-            {/* FOOTER */}
-            <div className="mt-5 flex justify-between items-center text-xs text-link">
-              <span>{team.pokemon.length} / 6 Pokémon</span>
-              <button className="font-bold underline hover:text-active-link transition">
-                View Team
-              </button>
-            </div>
           </div>
         ))}
 

@@ -33,7 +33,7 @@ export default function ComparePokemon() {
     query: '',
   })
 
-  const { data: pokemonList, isLoading } = usePokemonList(1, 1350)
+  const { data: pokemonList, isLoading } = usePokemonList(1, 1025)
   const { data: pokemon1 } = usePokemonDetail(p1.id)
   const { data: pokemon2 } = usePokemonDetail(p2.id)
 

@@ -8,14 +8,6 @@ const getUserTeamCount = async (userId) => {
   return parseInt(rows[0].count);
 };
 
-// const getTeamPokemonCount = async (teamId) => {
-//   const { rows } = await pool.query(
-//     `SELECT COUNT(*) FROM team_pokemon WHERE team_id = $1`,
-//     [teamId]
-//   );
-//   return parseInt(rows[0].count);
-// };
-
 const getTeamsByUser = async (userId) => {
   const { rows } = await pool.query(
     `

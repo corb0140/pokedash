@@ -71,9 +71,19 @@ const refresh = require("../middleware/validateToken").validateRefreshToken;
 
 // LOGOUT
 const logout = (req, res) => {
-  res.clearCookie(`accessToken`);
-  res.clearCookie(`refreshToken`);
-  res.status(200).json({ message: `Logout successful` });
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+  });
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+  });
+
+  res.status(200).json({ message: "Logout successful" });
 };
 
 // DELETE ACCOUNT

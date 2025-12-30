@@ -5,11 +5,12 @@ import { api } from '@/services/restfulAPI'
 import { useAuth } from '@/stores/authStore'
 
 export const useAuthQuery = () => {
-  const { setUser, clearUser } = useAuth()
+  const { setUser, clearUser, user } = useAuth()
 
   const query = useQuery({
     queryKey: ['me'],
     queryFn: async () => {
+      if (!user) return { user: null }
       const res = await api.post('/auth/refresh')
       return res.data
     },

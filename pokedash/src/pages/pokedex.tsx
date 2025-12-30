@@ -1,4 +1,3 @@
-import { Icon } from '@iconify/react'
 import { useEffect, useState } from 'react'
 import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import PokemonDetailModal from '@/components/Modals/PokemonDetailModal'

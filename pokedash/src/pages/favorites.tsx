@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Loader2, Search } from 'lucide-react'
+import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Icon } from '@iconify/react'

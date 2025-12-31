@@ -100,7 +100,7 @@ function App() {
 
   return (
     <>
-      <div className="flex flex-col py-6 px-10 lg:px-20 lg:py-10">
+      <div className="flex flex-col p-6 lg:px-20 lg:py-10">
         {/* HERO */}
         <section className="lg:relative flex flex-col items-center justify-between gap-8 lg:gap-6">
           <div className="flex flex-col gap-6">
@@ -115,14 +115,14 @@ function App() {
             <div className="flex gap-4 lg:self-center">
               <Link
                 to="/pokedex"
-                className="lg:text-sm px-6 py-4 bg-hp text-white rounded-xl hover:bg-white hover:text-hp transition-all duration-300"
+                className="lg:text-sm px-5 md:px-6 py-3 md:py-5 bg-hp text-white rounded-lg hover:bg-white hover:text-hp transition-all duration-300"
               >
                 Open Pokedex
               </Link>
 
               <Link
                 to="/dashboard"
-                className="lg:text-sm px-6 py-4 border border-link text-info-text rounded-xl hover:bg-info-bg hover:text-info-text hover:border-transparent transition-all duration-300"
+                className="lg:text-sm px-5 md:px-6 py-3 md:py-5 border border-link text-info-text rounded-lg hover:bg-info-bg hover:text-info-text hover:border-transparent transition-all duration-300"
               >
                 Open Dashboard
               </Link>

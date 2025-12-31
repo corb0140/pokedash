@@ -83,7 +83,7 @@ function Pokedex() {
           <div className="flex justify-between py-2">
             {/* SORT */}
             <div
-              className="flex gap-1 items-center bg-white p-1.5 rounded-lg cursor-pointer"
+              className="flex gap-1 items-center bg-white py-2 px-1.5 rounded-lg cursor-pointer shrink"
               onClick={() => setFilter('sortAsc', !filters.sortAsc)}
             >
               <p className="text-sm">
@@ -97,7 +97,8 @@ function Pokedex() {
             </div>
 
             {/* FROM TO */}
-            <div className="flex gap-3">
+            <div className="flex gap-2">
+              {/* FROM */}
               <div className="flex gap-0.5 items-center">
                 <p className="text-sm">From:</p>
                 <input
@@ -109,10 +110,11 @@ function Pokedex() {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') applyRange()
                   }}
-                  className="p-1 rounded-lg border border-gray-500/80"
+                  className="p-1 rounded-lg border border-link/80 max-w-15"
                 />
               </div>
 
+              {/* TO */}
               <div className="flex gap-0.5 items-center">
                 <p className="text-sm">To:</p>
                 <input
@@ -124,7 +126,7 @@ function Pokedex() {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') applyRange()
                   }}
-                  className="p-1 rounded-lg border border-gray-500/80"
+                  className="p-1 rounded-lg border border-link/80 max-w-15"
                 />
               </div>
             </div>

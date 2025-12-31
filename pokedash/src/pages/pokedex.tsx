@@ -107,6 +107,7 @@ function Pokedex() {
                   max={10000}
                   value={fromInput}
                   onChange={(e) => setFromInput(Number(e.target.value))}
+                  onBlur={applyRange}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') applyRange()
                   }}
@@ -123,6 +124,7 @@ function Pokedex() {
                   max={10000}
                   value={toInput}
                   onChange={(e) => setToInput(Number(e.target.value))}
+                  onBlur={applyRange}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') applyRange()
                   }}

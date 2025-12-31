@@ -39,8 +39,6 @@ function Login() {
         navigate({ to: '/' })
       },
     })
-
-    console.log('submitted')
   }
 
   return (

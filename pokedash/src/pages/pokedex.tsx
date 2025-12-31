@@ -109,7 +109,7 @@ function Pokedex() {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') applyRange()
                   }}
-                  className="p-1 rounded-lg border border-gray-500/80 max-w-20"
+                  className="p-1 rounded-lg border border-gray-500/80"
                 />
               </div>
 
@@ -124,7 +124,7 @@ function Pokedex() {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') applyRange()
                   }}
-                  className="p-1 rounded-lg border border-gray-500/80 max-w-20"
+                  className="p-1 rounded-lg border border-gray-500/80"
                 />
               </div>
             </div>
@@ -132,7 +132,7 @@ function Pokedex() {
 
           {/* SELECTS */}
           <div className="flex gap-2">
-            <div className="p-1 bg-white rounded-lg shadow-sm grow">
+            <div className="p-1 bg-white rounded-lg shadow-sm flex-1">
               <select
                 value={filters.type ?? ''}
                 onChange={(e) => setFilter('type', e.target.value || null)}
@@ -147,7 +147,7 @@ function Pokedex() {
               </select>
             </div>
 
-            <div className="p-1 bg-white rounded-lg shadow-sm grow">
+            <div className="p-1 bg-white rounded-lg shadow-sm flex-1">
               <select
                 value={filters.weakness ?? ''}
                 onChange={(e) => setFilter('weakness', e.target.value || null)}
@@ -162,7 +162,7 @@ function Pokedex() {
               </select>
             </div>
 
-            <div className="p-1 bg-white rounded-lg shadow-sm grow">
+            <div className="p-1 bg-white rounded-lg shadow-sm flex-1">
               <select
                 value={filters.ability ?? ''}
                 onChange={(e) => setFilter('ability', e.target.value || null)}

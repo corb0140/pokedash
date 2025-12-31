@@ -22,7 +22,7 @@ function DraggablePokemon({
       style={style}
       {...listeners}
       {...attributes}
-      className={`aspect-square rounded-lg bg-page-background flex flex-col items-center justify-center text-xs cursor-grab
+      className={`aspect-square rounded-lg bg-page-background flex flex-col items-center justify-center text-xs cursor-grab touch-none
         ${disabled ? 'opacity-30 pointer-events-none' : ''}`}
     >
       <img src={pokemon.image} alt={pokemon.name} className="h-10 w-10" />

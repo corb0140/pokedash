@@ -9,7 +9,7 @@ import {
 
 export function PokemonLegendaryPieChart({ data }: { data: Array<any> }) {
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" minHeight={300} height="90%">
       <PieChart>
         <Pie
           data={data}

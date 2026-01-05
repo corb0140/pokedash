@@ -100,29 +100,29 @@ function App() {
 
   return (
     <>
-      <div className="flex flex-col p-6 lg:px-20 lg:py-10">
+      <div className="flex flex-col p-6 lg:px-20 lg:py-10 2xl:py-15">
         {/* HERO */}
         <section className="lg:relative flex flex-col items-center justify-between gap-8 lg:gap-6">
           <div className="flex flex-col gap-6">
-            <h1 className="text-[clamp(2.5rem,5vw,6rem)] uppercase font-bold text-info-text lg:text-center">
+            <h1 className="text-[clamp(2.5rem,5vw,6rem)] 2xl:max-w-300 uppercase font-bold text-info-text lg:text-center">
               Explore the World of Pokemon
             </h1>
 
-            <p className="text-link lg:text-lg lg:text-center">
+            <p className="text-link lg:text-lg 2xl:text-2xl lg:text-center">
               Search, discover, and learn every Pokemon.
             </p>
 
             <div className="flex gap-4 lg:self-center">
               <Link
                 to="/pokedex"
-                className="lg:text-sm px-5 md:px-6 py-3 md:py-5 bg-hp text-white rounded-lg hover:bg-white hover:text-hp transition-all duration-300"
+                className="lg:text-sm 2xl:text-lg px-5 md:px-6 py-3 md:py-5 bg-hp text-white rounded-lg hover:bg-white hover:text-hp transition-all duration-300"
               >
                 Open Pokedex
               </Link>
 
               <Link
                 to="/dashboard"
-                className="lg:text-sm px-5 md:px-6 py-3 md:py-5 border border-link text-info-text rounded-lg hover:bg-info-bg hover:text-info-text hover:border-transparent transition-all duration-300"
+                className="lg:text-sm 2xl:text-lg px-5 md:px-6 py-3 md:py-5 border border-link text-info-text rounded-lg hover:bg-info-bg hover:text-info-text hover:border-transparent transition-all duration-300"
               >
                 Open Dashboard
               </Link>
@@ -132,7 +132,7 @@ function App() {
           <div className="relative">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-64 w-64 animate-pokeball"
+              className="h-64 w-64 2xl:h-80 2xl:w-80 animate-pokeball"
               viewBox="0 0 24 24"
             >
               <path

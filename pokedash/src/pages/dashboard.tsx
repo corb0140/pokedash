@@ -23,7 +23,7 @@ function Dashboard() {
     <div className="p-6 lg:px-20">
       <h2 className="uppercase text-4xl lg:hidden">Dashboard</h2>
 
-      <div className="not-lg:mt-10 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+      <div className="not-lg:mt-10 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 min-h-screen">
         <StatTile label="Total Pokémon" value={totalPokemon} />
         <StatTile label="Legendaries" value={legendaryCount} />
         <StatTile
@@ -33,17 +33,21 @@ function Dashboard() {
         <StatTile label="Unique Types" value={pokemonByType.length} />
 
         <div className="lg:col-span-2 rounded-2xl bg-white/70 backdrop-blur p-4 shadow">
-          <h3 className="mb-2 font-semibold">Pokémon by Type</h3>
+          <h3 className="mb-2 font-semibold 2xl:text-4xl">Pokémon by Type</h3>
           <PokemonTypePieChart data={pokemonByType} />
         </div>
 
         <div className="lg:col-span-2 rounded-2xl bg-white/70 backdrop-blur p-4 shadow">
-          <h3 className="mb-2 font-semibold">Legendary Distribution</h3>
+          <h3 className="mb-2 font-semibold 2xl:text-4xl">
+            Legendary Distribution
+          </h3>
           <PokemonLegendaryPieChart data={legendaryPie} />
         </div>
 
-        <div className="lg:col-span-4 rounded-2xl bg-white/70 backdrop-blur p-4 shadow">
-          <h3 className="mb-2 font-semibold">Pokémon by Generation</h3>
+        <div className="lg:col-span-4 rounded-2xl bg-white/70 backdrop-blur p-7 shadow h-full">
+          <h3 className="mb-2 font-semibold 2xl:text-4xl">
+            Pokémon by Generation
+          </h3>
           <PokemonGenerationBarChart data={pokemonByGeneration} />
         </div>
       </div>

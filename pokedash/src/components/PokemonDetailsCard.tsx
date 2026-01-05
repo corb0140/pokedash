@@ -68,7 +68,7 @@ export default function PokemonDetailsCard({
       </div>
 
       {/* ABILITIES */}
-      <div className="mt-5">
+      <div className="mt-5 2xl:mt-10">
         <h3 className="font-semibold mb-2 text-info-text uppercase text-center tracking-widest">
           Abilities
         </h3>
@@ -86,7 +86,7 @@ export default function PokemonDetailsCard({
       </div>
 
       {/* GRID - HEIGHT, BASE, WEIGHT, WEAKNESS */}
-      <div className="mt-5 grid grid-cols-2 grid-rows-2 gap-4">
+      <div className="mt-5 2xl:mt-10 grid grid-cols-2 grid-rows-2 gap-4">
         {[
           { title: 'height', data: pokemonData.height },
           { title: 'weight', data: pokemonData.weight },
@@ -116,7 +116,7 @@ export default function PokemonDetailsCard({
       </div>
 
       {/* STATS */}
-      <div className="mt-5">
+      <div className="mt-5 2xl:mt-10">
         <h3 className="font-semibold mb-2">Stats</h3>
 
         <div className="flex gap-3">
@@ -231,7 +231,7 @@ export default function PokemonDetailsCard({
       {selectedId && !isVisible && (
         <div className="w-full flex">
           <Link
-            className="inline-flex mx-auto mt-5 py-2.5 px-6 bg-info-text text-white rounded-lg text-sm"
+            className="inline-flex mx-auto mt-5 2xl:mt-10 py-2.5 2xl:py-4 px-6 bg-info-text text-white rounded-lg text-sm"
             to="/$pokemonId"
             params={{ pokemonId: String(selectedId) }}
           >

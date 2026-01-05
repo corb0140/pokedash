@@ -75,7 +75,7 @@ function Pokedex() {
 
         {/* POKEMON MODAL */}
         <div className="lg:col-span-2 lg:row-span-6 hidden lg:block">
-          <PokemonDetailsCard styles="relative h-[81vh] w-full bg-white overflow-y-scroll no-scrollbar rounded-2xl py-6 px-5 shadow-[-2px_0_10px_rgba(0,0,0,0.1)]" />
+          <PokemonDetailsCard styles="relative h-[81vh] 2xl:h-fit border w-full bg-white overflow-y-scroll no-scrollbar rounded-2xl py-6 2xl:py-10 px-5 shadow-[-2px_0_10px_rgba(0,0,0,0.1)]" />
         </div>
 
         {/* FILTERS */}
@@ -186,12 +186,12 @@ function Pokedex() {
         {/* POKEMON LIST */}
         <div className="lg:col-span-4">
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center mt-10 h-[50vh]">
+            <div className="flex flex-col items-center justify-center mt-10 h-[50vh] 2xl:h-[60vh]">
               <Loader2 className="animate-loader h-16 w-16 text-hp" />
               <p className="mt-4 text-lg">Loading Pokémon</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mt-10 lg:mt-5 lg:px-1 lg:h-[55vh] lg:overflow-y-scroll">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mt-10 lg:mt-5 lg:px-1 lg:h-[55vh] 2xl:min-h-screen lg:overflow-y-scroll">
               {filteredPokemon.map((data) => (
                 <div
                   onClick={() => {

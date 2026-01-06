@@ -213,7 +213,7 @@ function Pokedex() {
                     <p className="text-sm">{`Nº${data.id}`}</p>
 
                     <p className="text-info-text font-semibold capitalize">
-                      {data.name}
+                      {data.name?.replace('-', ' ')}
                     </p>
 
                     <div className="flex items-center gap-3 mt-3">

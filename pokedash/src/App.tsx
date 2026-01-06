@@ -84,7 +84,10 @@ function App() {
 
   // GUESS GAME
   const handleGuessPokemon = (guess: string) => {
-    if (pokemonData?.name.trim().toLowerCase() === guess.trim().toLowerCase()) {
+    if (
+      pokemonData?.name.replace('-', ' ').trim().toLowerCase() ===
+      guess.trim().toLowerCase()
+    ) {
       setIsGuessCorrect(true)
       setInput('')
     } else {
@@ -199,7 +202,7 @@ function App() {
             className={`${isGuessCorrect ? 'block' : 'hidden'} text-lg text-center text-info-text font-bold tracking-wider uppercase`}
           >
             {isGuessCorrect
-              ? `It's ${pokemonData?.name}`
+              ? `It's ${pokemonData?.name.replace('-', ' ')}`
               : 'Wrong Guess, Try Again'}
           </p>
         </section>

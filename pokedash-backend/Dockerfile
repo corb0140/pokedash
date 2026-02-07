@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Copy application code inside the container.
 COPY package*.json ./
-COPY src ./
+# COPY src ./
 
 # Install dependencies inside container. (yarn add if using yarn)
 RUN npm install
@@ -15,4 +15,4 @@ RUN npm install
 EXPOSE 8000
 
 # Command to run the application
-CMD ["node", "server.js"]
+CMD ["npm", "run", "dev"]

@@ -8,7 +8,7 @@ const signup = async (req, res) => {
     const { user, accessToken, refreshToken } = await authService.signup(
       email,
       password,
-      username
+      username,
     );
 
     // Set cookies for access and refresh tokens
@@ -40,8 +40,10 @@ const login = async (req, res) => {
     const { identifier, password } = req.body;
     const { user, accessToken, refreshToken } = await authService.login(
       identifier,
-      password
+      password,
     );
+
+    throw new Error("LOGIN TEST ERROR");
 
     // Set cookies for access and refresh tokens
     res.cookie(`accessToken`, accessToken, {
@@ -61,6 +63,9 @@ const login = async (req, res) => {
       user,
     });
   } catch (error) {
+    console.error("LOGIN ERROR FULL:", error); // <--- important
+    logger.error(error);
+
     logger.error(`Error in login: ${error.message}`);
     res.status(500).json({ message: `Internal server error` });
   }

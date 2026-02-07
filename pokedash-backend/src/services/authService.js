@@ -9,17 +9,17 @@ const {
 const signup = async (email, password, username) => {
   const { rows: existingUsers } = await pool.query(
     `SELECT EXISTS (SELECT 1 FROM users WHERE email = $1 OR username = $2)`,
-    [email, username]
+    [email, username],
   );
 
   if (existingUsers[0].exists)
-    throw new ERROR("User already exists with this email or username");
+    throw new Error("User already exists with this email or username");
 
   const hashPassword = await bcrypt.hash(password, 10);
 
   const { rows } = await pool.query(
     `INSERT INTO users (email, password, username) VALUES ($1, $2, $3) RETURNING *`,
-    [email, hashPassword, username]
+    [email, hashPassword, username],
   );
 
   const user = rows[0];
@@ -38,7 +38,7 @@ const signup = async (email, password, username) => {
 const login = async (identifier, password) => {
   const { rows } = await pool.query(
     `SELECT * FROM users WHERE email = $1 OR username = $1`,
-    [identifier]
+    [identifier],
   );
 
   const user = rows[0];
@@ -68,7 +68,7 @@ const deleteAccount = async (userId) => {
 const changeUsername = async (userId, newUsername) => {
   const { rows: existing } = await pool.query(
     `SELECT 1 FROM users WHERE username = $1`,
-    [newUsername]
+    [newUsername],
   );
 
   if (existing.length > 0) {
@@ -77,7 +77,7 @@ const changeUsername = async (userId, newUsername) => {
 
   const { rows } = await pool.query(
     `UPDATE users SET username = $1 WHERE id = $2 RETURNING *`,
-    [newUsername, userId]
+    [newUsername, userId],
   );
 
   return rows[0];
@@ -87,7 +87,7 @@ const changeUsername = async (userId, newUsername) => {
 const changePassword = async (userId, currentPassword, newPassword) => {
   const { rows } = await pool.query(
     `SELECT password FROM users WHERE id = $1`,
-    [userId]
+    [userId],
   );
 
   const user = rows[0];

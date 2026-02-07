@@ -1,0 +1,50 @@
+services:
+  frontend:
+    build:
+      context: ./pokedash # Path to your frontend directory
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Map host port 3000 to container port 3000
+    depends_on:
+      - backend
+    env_file:
+      - ./pokedash/.env
+    networks:
+      - pokedash-network
+
+  backend:
+    build:
+      context: ./pokedash-backend # Path to your backend directory
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000" # Map host port 8000 to container port 8000
+    env_file:
+      - ./pokedash-backend/.env
+    networks:
+      - pokedash-network
+    # Link the backend to the database service if you have one
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17-alpine
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./pokedash-backend/.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  pokedash-network:
+    driver: bridge
+
+# Define volumes for persistent data (e.g., database)
+volumes:
+  postgres_data:

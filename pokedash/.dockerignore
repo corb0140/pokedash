@@ -1,0 +1,32 @@
+# Development tools
+eslint.config.js
+.prettierrc
+.prettierignore
+
+# Documentation
+README.md
+*.md
+
+# Git
+.git
+.gitignore
+
+# Platform configs
+vercel.json
+
+# Editor configs
+.vscode
+.cta.json
+
+# OS files
+.DS_Store
+
+# Environment
+.env
+.env.local
+
+# Dependencies
+node_modules
+
+# Build output (if building inside Docker)
+dist

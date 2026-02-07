@@ -3,14 +3,30 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const logger = require("./helpers/logger");
+const createTables = require("./seed/createTables");
 
 // CONFIGURATIONS
 dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-// app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
-app.use(cors({ origin: process.env.VERCEL_URL, credentials: true }));
+const allowedOrigins = [
+  process.env.CLIENT_URL || "http://localhost:3000",
+  process.env.VERCEL_URL,
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed"));
+      }
+    },
+    credentials: true,
+  }),
+);
 
 // IMPORT ROUTES
 const authRoutes = require("./routes/authRoutes");
@@ -29,6 +45,18 @@ app.get("/health", (req, res) => {
 
 // SERVER
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  logger.info(`Server is running on port ${PORT}`);
-});
+
+// CREATE TABLES
+(async () => {
+  try {
+    await createTables.seedAllTables();
+    logger.info("Database tables are ready.");
+
+    app.listen(PORT, () => {
+      logger.info(`Server is running on port ${PORT}`);
+    });
+  } catch (err) {
+    logger.error("Error initializing database tables:", err);
+    process.exit(1);
+  }
+})();

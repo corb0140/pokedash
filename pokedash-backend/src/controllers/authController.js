@@ -43,8 +43,6 @@ const login = async (req, res) => {
       password,
     );
 
-    throw new Error("LOGIN TEST ERROR");
-
     // Set cookies for access and refresh tokens
     res.cookie(`accessToken`, accessToken, {
       httpOnly: true,
@@ -58,12 +56,14 @@ const login = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     });
 
+    console.log("successful login");
+
     res.status(200).json({
       message: `Login successful`,
       user,
     });
   } catch (error) {
-    console.error("LOGIN ERROR FULL:", error); // <--- important
+    console.error("LOGIN ERROR FULL:", error);
     logger.error(error);
 
     logger.error(`Error in login: ${error.message}`);
@@ -88,6 +88,7 @@ const logout = (req, res) => {
     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
   });
 
+  console.log("Logged out");
   res.status(200).json({ message: "Logout successful" });
 };
 

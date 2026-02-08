@@ -1,0 +1,65 @@
+# docker-compose.prod.yml
+# Production configuration - uses pre-built images from Docker Hub
+# Usage: docker-compose -f docker-compose.prod.yml up
+
+services:
+  frontend:
+    image: kolizak/pokedash-frontend:latest
+    container_name: pokedash-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - pokedash-network
+    restart: unless-stopped
+
+  backend:
+    image: kolizak/pokedash-backend:latest
+    container_name: pokedash-backend
+    ports:
+      - "8000:8000"
+    environment:
+      # Database connection
+      - DATABASE_URL=postgresql://postgres:pokedash_password@db:5432/pokedash
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pokedash_password
+      - POSTGRES_DB=pokedash
+      # Application settings
+      - NODE_ENV=production
+      - PORT=8000
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - pokedash-network
+    restart: unless-stopped
+
+  db:
+    image: postgres:17-alpine
+    container_name: pokedash-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pokedash_password
+      - POSTGRES_DB=pokedash
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pokedash-network
+    restart: unless-stopped
+
+networks:
+  pokedash-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

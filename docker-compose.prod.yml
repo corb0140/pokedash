@@ -1,6 +1,5 @@
 # docker-compose.prod.yml
 # Production configuration - uses pre-built images from Docker Hub
-# Usage: docker-compose -f docker-compose.prod.yml up
 
 services:
   frontend:

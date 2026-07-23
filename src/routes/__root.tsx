@@ -1,12 +1,12 @@
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 import Navbar from '@/components/Navbar'
-import { useAuthQuery } from '@/queries/useAuthQuery'
+// import { useAuthQuery } from '@/queries/useAuthQuery'
 
 export const rootRoute = createRootRoute({
   component: () => {
-    const { isLoading } = useAuthQuery()
+    // const { isLoading } = useAuthQuery()
 
-    if (isLoading) return <div>Loading...</div>
+    // if (isLoading) return <div>Loading...</div>
 
     return (
       <div>

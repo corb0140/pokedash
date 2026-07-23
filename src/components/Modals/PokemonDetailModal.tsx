@@ -2,7 +2,6 @@ import gsap from 'gsap'
 import { useEffect, useRef } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import type { PokemonProps } from '@/queries/getPokemonQuery'
 import { usePokemonStore } from '@/stores/pokemonStore'
 import { usePokemonDetail } from '@/queries/usePokemonDetail'
 import { TYPE_ICONS } from '@/constants/typeIcons'
@@ -10,7 +9,7 @@ import { STATS } from '@/constants/stats'
 import { TYPE_COLORS } from '@/constants/typeColors'
 import { usePokemonNextPrev } from '@/hooks/usePokemonNextPrev'
 
-export type PokemonDetailModalProps = PokemonProps & {
+export type PokemonDetailModalProps = {
   onClose?: () => void
 }
 

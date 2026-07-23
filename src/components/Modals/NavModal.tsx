@@ -3,13 +3,13 @@ import { Link } from '@tanstack/react-router'
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { navLinks } from '@/data/navLinks'
-import { useAuth } from '@/stores/authStore'
+// import { useAuth } from '@/stores/authStore'
 
 function NavModal({ onClose }: { onClose: () => void }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const lettersRef = useRef<Array<HTMLSpanElement>>([])
   const closeText = [...'close']
-  const user = useAuth.getState().user
+  // const user = useAuth.getState().user
 
   useEffect(() => {
     gsap.fromTo(

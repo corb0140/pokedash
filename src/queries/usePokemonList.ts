@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchPokemonList } from './getPokemonQuery'
+import { fetchPokemonRange } from './getPokemonQuery'
 
-export function usePokemonList() {
+export function usePokemonList(from = 1, to = 1025) {
   return useQuery({
-    queryKey: ['pokemon-list'],
-    queryFn: fetchPokemonList,
+    queryKey: ['pokemon-list', from, to],
+    queryFn: () => fetchPokemonRange(from, to),
     staleTime: 1000 * 60 * 60 * 24,
+    placeholderData: (previousData) => previousData,
   })
 }

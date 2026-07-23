@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { usePokemonDetail } from '@/queries/usePokemonDetail'
+import { usePokemonGuess } from '@/queries/usePokemonGuess'
 
 function GuessPokemon() {
   const MAX_POKEMON_ID = 1025
@@ -12,10 +12,11 @@ function GuessPokemon() {
     data: pokemonData,
     isLoading,
     isError,
-  } = usePokemonDetail(randomPokemon)
+  } = usePokemonGuess(randomPokemon)
 
   const [input, setInput] = useState('')
   const [isGuessCorrect, setIsGuessCorrect] = useState(false)
+  const [isRevealed, setIsRevealed] = useState(false)
 
   const handleGuessPokemon = (guess: string) => {
     if (
@@ -29,14 +30,22 @@ function GuessPokemon() {
     }
   }
 
+  const revealAnswer = () => {
+    setIsRevealed(true)
+    setInput('')
+  }
+
   const resetGame = () => {
     setIsGuessCorrect(false)
+    setIsRevealed(false)
     setInput('')
     setRandomPokemon(Math.floor(Math.random() * MAX_POKEMON_ID) + 1)
   }
 
+  const isGameComplete = isGuessCorrect || isRevealed
+
   return (
-    <main className="min-h-screen p-6 lg:px-20 lg:py-10 flex flex-col items-center">
+    <main className="h-auto p-6 lg:px-20 lg:py-10 flex flex-col items-center">
       <section className="bg-hp mt-10 rounded-2xl shadow-sm p-6 flex flex-col items-center gap-4 w-full max-w-125">
         <h1 className="text-2xl font-bold">Guess the Pokémon!</h1>
 
@@ -50,7 +59,7 @@ function GuessPokemon() {
               src={pokemonData.image}
               alt="Guess the Pokémon"
               className={`h-60 w-60 object-contain transition-all duration-300 ${
-                isGuessCorrect ? 'brightness-100' : 'brightness-0'
+                isGameComplete ? 'brightness-100' : 'brightness-0'
               }`}
             />
           </div>
@@ -58,7 +67,7 @@ function GuessPokemon() {
 
         <input
           type="text"
-          placeholder={isGuessCorrect ? 'End of Game' : 'Enter Pokémon Name'}
+          placeholder={isGameComplete ? 'Game Complete' : 'Enter Pokémon Name'}
           className="border border-white text-white rounded-lg px-4 py-2 w-full text-center"
           value={input}
           onChange={(e) => setInput(e.currentTarget.value)}
@@ -67,16 +76,23 @@ function GuessPokemon() {
               handleGuessPokemon(input)
             }
           }}
-          disabled={isGuessCorrect}
+          disabled={isGameComplete}
         />
 
-        {!isGuessCorrect ? (
-          <div className="flex gap-2">
+        {!isGameComplete ? (
+          <div className="flex flex-wrap justify-center gap-2">
             <button
               onClick={() => handleGuessPokemon(input)}
               className="px-6 py-2 text-info-text bg-white rounded-lg hover:scale-105 transition"
             >
               Guess
+            </button>
+
+            <button
+              onClick={revealAnswer}
+              className="px-6 py-2 text-info-text bg-white rounded-lg hover:scale-105 transition"
+            >
+              Reveal Answer
             </button>
 
             <button
@@ -91,13 +107,21 @@ function GuessPokemon() {
             onClick={resetGame}
             className="px-6 py-2 text-info-text bg-white rounded-lg hover:scale-105 transition"
           >
-            Reset Game
+            New Pokémon
           </button>
         )}
 
+        {/* CORRECT GUESS MESSAGE */}
         {isGuessCorrect && (
           <p className="text-lg text-center text-info-text font-bold tracking-wider uppercase">
-            It's {pokemonData?.name.replace('-', ' ')}!
+            You guessed it! It's {pokemonData?.name.replace('-', ' ')}!
+          </p>
+        )}
+
+        {/* REVEALED ANSWER MESSAGE */}
+        {isRevealed && !isGuessCorrect && (
+          <p className="text-lg text-center text-info-text font-bold tracking-wider uppercase">
+            The Pokémon was {pokemonData?.name.replace('-', ' ')}!
           </p>
         )}
       </section>

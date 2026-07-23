@@ -2,14 +2,29 @@ import { useEffect, useState } from 'react'
 import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import PokemonDetailModal from '@/components/Modals/PokemonDetailModal'
 import PokemonDetailsCard from '@/components/PokemonDetailsCard'
+import { TYPE_COLORS } from '@/constants/typeColors'
+import { filterPokemon } from '@/utils/pokemonSelectors'
 import { usePokemonList } from '@/queries/usePokemonList'
 import { usePokemonStore } from '@/stores/pokemonStore'
 import SearchBar from '@/components/SearchBar'
 
 function Pokedex() {
   const [isMobile, setIsMobile] = useState(false)
+  const [from, setFrom] = useState(1)
+  const [to, setTo] = useState(1025)
+  const [fromInput, setFromInput] = useState(from)
+  const [toInput, setToInput] = useState(to)
 
-  const { data: pokemonData = [], isLoading, isError } = usePokemonList()
+  const {
+    data: pokemonData = [],
+    isLoading,
+    // isError,
+    error,
+  } = usePokemonList(from, to)
+
+  console.log('Pokemon data:', pokemonData)
+  console.log('Loading:', isLoading)
+  console.log('Error:', error)
 
   const {
     filters,
@@ -20,52 +35,32 @@ function Pokedex() {
     isModalOpen,
   } = usePokemonStore()
 
-  // -------------------------
-  // FILTER POKÉMON
-  // -------------------------
+  const filteredPokemon = filterPokemon(pokemonData, filters)
 
-  const filteredPokemon = pokemonData
-    .filter((pokemon) => {
-      const search = filters.search.trim().toLowerCase()
+  const allTypes = [...new Set(pokemonData.flatMap((p) => p.types))]
+  const allWeaknesses = [...new Set(pokemonData.flatMap((p) => p.weaknesses))]
+  const allAbilities = [...new Set(pokemonData.flatMap((p) => p.abilities))]
 
-      if (!search) return true
-
-      return pokemon.name.toLowerCase().replace('-', ' ').includes(search)
-    })
-    .sort((a, b) => {
-      if (filters.sortAsc) {
-        return a.id - b.id
-      }
-
-      return b.id - a.id
-    })
-
-  // -------------------------
   // MOBILE CHECK
-  // -------------------------
-
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024)
     }
 
     checkMobile()
-
     window.addEventListener('resize', checkMobile)
 
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // -------------------------
-  // ERROR
-  // -------------------------
-
-  if (isError) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-lg">Failed to load Pokémon.</p>
-      </div>
-    )
+  // RANGES
+  function applyRange() {
+    const newFrom = Math.max(1, Math.min(fromInput, toInput))
+    const newTo = Math.max(newFrom, toInput)
+    setFrom(newFrom)
+    setTo(newTo)
+    setFromInput(newFrom)
+    setToInput(newTo)
   }
 
   return (
@@ -74,7 +69,6 @@ function Pokedex() {
         <h2 className="uppercase text-4xl lg:hidden">Pokedex</h2>
 
         {/* SEARCH BAR */}
-
         <div className="not-lg:mt-10 relative bg-white rounded-xl overflow-hidden flex items-center lg:col-span-4">
           <SearchBar
             value={filters.search}
@@ -82,18 +76,15 @@ function Pokedex() {
           />
         </div>
 
-        {/* POKÉMON DETAILS */}
-
+        {/* POKEMON MODAL */}
         <div className="lg:col-span-2 lg:row-span-6 hidden lg:block">
           <PokemonDetailsCard styles="relative h-[81vh] 2xl:h-fit border w-full bg-white overflow-y-scroll no-scrollbar rounded-2xl py-6 2xl:py-10 px-5 shadow-[-2px_0_10px_rgba(0,0,0,0.1)]" />
         </div>
 
         {/* FILTERS */}
-
         <div className="flex flex-col gap-4 mt-10 lg:mt-0 lg:col-span-4">
-          {/* SORT */}
-
           <div className="flex justify-between py-2">
+            {/* SORT */}
             <div
               className="flex gap-1 items-center bg-white py-2 px-1.5 rounded-lg cursor-pointer shrink"
               onClick={() => setFilter('sortAsc', !filters.sortAsc)}
@@ -101,63 +92,149 @@ function Pokedex() {
               <p className="text-sm">
                 {filters.sortAsc ? 'Ascending' : 'Descending'}
               </p>
-
               {filters.sortAsc ? (
                 <ChevronUp className="h-4 w-4" />
               ) : (
                 <ChevronDown className="h-4 w-4" />
               )}
             </div>
+
+            {/* FROM TO */}
+            <div className="flex gap-2">
+              {/* FROM */}
+              <div className="flex gap-0.5 items-center">
+                <p className="text-sm">From:</p>
+                <input
+                  type="number"
+                  min={1}
+                  max={10000}
+                  value={fromInput}
+                  onChange={(e) => setFromInput(Number(e.target.value))}
+                  onBlur={applyRange}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') applyRange()
+                  }}
+                  className="p-1 rounded-lg border border-link/80 max-w-15"
+                />
+              </div>
+
+              {/* TO */}
+              <div className="flex gap-0.5 items-center">
+                <p className="text-sm">To:</p>
+                <input
+                  type="number"
+                  min={1}
+                  max={10000}
+                  value={toInput}
+                  onChange={(e) => setToInput(Number(e.target.value))}
+                  onBlur={applyRange}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') applyRange()
+                  }}
+                  className="p-1 rounded-lg border border-link/80 max-w-18"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* SELECTS */}
+          <div className="flex gap-2">
+            <div className="p-1 bg-white rounded-lg shadow-sm flex-1">
+              <select
+                value={filters.type ?? ''}
+                onChange={(e) => setFilter('type', e.target.value || null)}
+                className="w-full text-sm"
+              >
+                <option value="">Type</option>
+                {allTypes.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="p-1 bg-white rounded-lg shadow-sm flex-1">
+              <select
+                value={filters.weakness ?? ''}
+                onChange={(e) => setFilter('weakness', e.target.value || null)}
+                className="w-full text-sm"
+              >
+                <option value="">Weakness</option>
+                {allWeaknesses.map((w) => (
+                  <option key={w} value={w}>
+                    {w}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="p-1 bg-white rounded-lg shadow-sm flex-1">
+              <select
+                value={filters.ability ?? ''}
+                onChange={(e) => setFilter('ability', e.target.value || null)}
+                className="w-full text-sm"
+              >
+                <option value="">Ability</option>
+                {allAbilities.map((a: any) => (
+                  <option key={a} value={a}>
+                    {a.replace('-', ' ')}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* POKÉMON LIST */}
-
+        {/* POKEMON LIST */}
         <div className="lg:col-span-4">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center mt-10 h-[50vh] 2xl:h-[60vh]">
               <Loader2 className="animate-loader h-16 w-16 text-hp" />
-
               <p className="mt-4 text-lg">Loading Pokémon</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mt-10 lg:mt-5 lg:px-1 lg:h-[55vh] 2xl:min-h-screen lg:overflow-y-scroll">
-              {filteredPokemon.map((pokemon) => (
-                <button
-                  type="button"
+              {filteredPokemon.map((data) => (
+                <div
                   onClick={() => {
-                    setSelectedId(pokemon.id)
+                    setSelectedId(data.id)
                     openModal()
                   }}
-                  key={pokemon.id}
+                  key={data.id}
                   className="bg-white shadow-sm rounded-lg px-5 py-10 lg:py-4 flex flex-col gap-2 items-center relative lg:h-fit"
                 >
-                  {/* IMAGE */}
-
                   <div>
                     <img
-                      src={pokemon.image}
-                      alt={pokemon.name}
+                      src={data.image}
+                      alt={data.name}
                       className="object-contain h-20 w-20 lg:h-15 lg:w-15"
                     />
                   </div>
 
-                  {/* INFO */}
-
                   <div className="mt-auto flex flex-col items-center gap-1.5">
-                    <p className="text-sm">{`Nº${pokemon.id}`}</p>
+                    <p className="text-sm">{`Nº${data.id}`}</p>
 
                     <p className="text-info-text font-semibold capitalize">
-                      {pokemon.name.replace('-', ' ')}
+                      {data.name.replace('-', ' ')}
                     </p>
+
+                    <div className="flex items-center gap-3 mt-3">
+                      {data.types.map((t, i) => (
+                        <span
+                          key={i}
+                          className={`rounded-lg p-2 text-white ${TYPE_COLORS[t]} uppercase font-semibold text-xs`}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           )}
         </div>
-
-        {/* MOBILE DETAILS MODAL */}
 
         {isModalOpen && isMobile && (
           <PokemonDetailModal onClose={() => closeModal()} />

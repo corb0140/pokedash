@@ -44,8 +44,11 @@ export function getPokemonImage(id: number) {
 /**
  * Fetch the lightweight Pokémon list.
  *
- * This only makes ONE API request for all Pokémon.
- * It does NOT fetch individual Pokémon details.
+ * Only one API request is made to retrieve
+ * the complete list of Pokémon.
+ *
+ * No individual Pokémon detail requests
+ * are made here.
  */
 export async function fetchPokemonList(): Promise<Array<PokemonListItem>> {
   const list = await getAllPokemon()
@@ -64,8 +67,8 @@ export async function fetchPokemonList(): Promise<Array<PokemonListItem>> {
 /**
  * Fetch complete data for a single Pokémon.
  *
- * This is only called when detailed information
- * about a specific Pokémon is required.
+ * This is used when detailed information about
+ * a specific Pokémon is required.
  */
 export async function fetchPokemonById(id: number): Promise<PokemonProps> {
   const [pokemon, species] = await Promise.all([
@@ -77,14 +80,8 @@ export async function fetchPokemonById(id: number): Promise<PokemonProps> {
     (t: { type: { name: string } }) => t.type.name,
   )
 
-  /**
-   * Fetch type data from TanStack Query cache.
-   *
-   * If the type has already been requested,
-   * TanStack Query can reuse the cached result.
-   */
   const typeResponses = await Promise.all(
-    types.map((type: any) =>
+    types.map((type: string) =>
       queryClient.fetchQuery({
         queryKey: ['pokemon-type', type],
         queryFn: () => getPokemonTypeData(type),
@@ -105,13 +102,11 @@ export async function fetchPokemonById(id: number): Promise<PokemonProps> {
 
   return {
     id: pokemon.id,
-
     image:
-      pokemon.sprites.other.showdown.front_default ||
-      pokemon.sprites.other.dream_world.front_default,
-
+      pokemon.sprites.other?.showdown?.front_default ||
+      pokemon.sprites.other?.dream_world?.front_default ||
+      pokemon.sprites.front_default,
     name: pokemon.name,
-
     order: pokemon.order,
 
     types,
@@ -123,78 +118,48 @@ export async function fetchPokemonById(id: number): Promise<PokemonProps> {
     weaknesses,
 
     isLegendary: species.is_legendary,
-
     isMythical: species.is_mythical,
   }
 }
 
 /**
- * Fetch all Pokémon types.
+ * Fetch detailed Pokémon data for a selected range.
  *
- * This is useful for your Type Match-Ups page.
- * Only 18 type requests are required.
+ * The lightweight Pokémon list is fetched first.
+ * Only Pokémon between `from` and `to` are then
+ * requested from the API.
+ *
+ * Pokémon are processed in controlled batches to
+ * prevent sending too many requests at once.
  */
-export async function fetchAllPokemonTypes() {
-  const types = [
-    'normal',
-    'fire',
-    'water',
-    'electric',
-    'grass',
-    'ice',
-    'fighting',
-    'poison',
-    'ground',
-    'flying',
-    'psychic',
-    'bug',
-    'rock',
-    'ghost',
-    'dragon',
-    'dark',
-    'steel',
-    'fairy',
-  ]
+export async function fetchPokemonRange(
+  from = 1,
+  to = 1025,
+): Promise<Array<PokemonProps>> {
+  const pokemonList = await fetchPokemonList()
 
-  return Promise.all(
-    types.map(async (type) => {
-      const data = await queryClient.fetchQuery({
-        queryKey: ['pokemon-type', type],
-        queryFn: () => getPokemonTypeData(type),
-        staleTime: 1000 * 60 * 60 * 24,
-      })
+  const start = Math.max(1, from)
+  const end = Math.min(to, pokemonList.length)
 
-      return {
-        name: type,
+  const selectedPokemon = pokemonList.slice(start - 1, end)
 
-        strongAgainst: data.damage_relations.double_damage_to.map(
-          (item: { name: string }) => item.name,
-        ),
+  const results: Array<PokemonProps> = []
 
-        weakAgainst: data.damage_relations.double_damage_from.map(
-          (item: { name: string }) => item.name,
-        ),
+  const BATCH_SIZE = 50
 
-        immuneTo: data.damage_relations.no_damage_from.map(
-          (item: { name: string }) => item.name,
-        ),
-      }
-    }),
-  )
+  for (let i = 0; i < selectedPokemon.length; i += BATCH_SIZE) {
+    const batch = selectedPokemon.slice(i, i + BATCH_SIZE)
+
+    const batchResults = await Promise.all(
+      batch.map((pokemon) => fetchPokemonById(pokemon.id)),
+    )
+
+    results.push(...batchResults)
+  }
+
+  return results
 }
 
-/**
- * Fetch Pokémon data required for the dashboard.
- *
- * Retrieves the lightweight Pokémon list first, then fetches
- * only the details needed for dashboard statistics:
- * - Pokémon ID
- * - Pokémon types
- * - Legendary status
- *  Pokémon are processed in batches to limit the number of
- * concurrent API requests and reduce the risk of rate limiting
- * or request failures.
- */
 export type PokemonDashboardData = {
   id: number
   types: Array<string>
@@ -207,19 +172,20 @@ export async function fetchPokemonDashboardData(
   from = 1,
   to = 1025,
 ): Promise<Array<PokemonDashboardData>> {
-  // Get the lightweight list first
   const pokemonList = await fetchPokemonList()
 
-  const batch = pokemonList.slice(from - 1, to)
+  const start = Math.max(1, from)
+  const end = Math.min(to, pokemonList.length)
+
+  const selectedPokemon = pokemonList.slice(start - 1, end)
 
   const results: Array<PokemonDashboardData> = []
 
-  // Process Pokémon in controlled batches
-  for (let i = 0; i < batch.length; i += DASHBOARD_BATCH_SIZE) {
-    const currentBatch = batch.slice(i, i + DASHBOARD_BATCH_SIZE)
+  for (let i = 0; i < selectedPokemon.length; i += DASHBOARD_BATCH_SIZE) {
+    const batch = selectedPokemon.slice(i, i + DASHBOARD_BATCH_SIZE)
 
     const batchResults = await Promise.all(
-      currentBatch.map(async (pokemon) => {
+      batch.map(async (pokemon) => {
         const [details, species] = await Promise.all([
           getPokemonById(pokemon.id),
           getPokemonSpeciesById(pokemon.id),
@@ -227,11 +193,9 @@ export async function fetchPokemonDashboardData(
 
         return {
           id: pokemon.id,
-
           types: details.types.map(
             (type: { type: { name: string } }) => type.type.name,
           ),
-
           isLegendary: species.is_legendary,
         }
       }),

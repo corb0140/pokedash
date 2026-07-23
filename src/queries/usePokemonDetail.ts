@@ -12,9 +12,11 @@ export function usePokemonDetail(id: number | null) {
     queryKey: pokemonKeys.detail(id!),
     enabled: !!id,
     queryFn: async () => {
-      const pokemon = await getPokemonById(id!)
-      const species = await getPokemonSpeciesById(id!)
-      const locations = await getPokemonLocationsById(id!)
+      const [pokemon, species, locations] = await Promise.all([
+        getPokemonById(id!),
+        getPokemonSpeciesById(id!),
+        getPokemonLocationsById(id!),
+      ])
 
       // TYPES
       const types = pokemon.types.map((t: any) => t.type.name)

@@ -1,0 +1,28 @@
+import { useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import type { User } from '@/stores/authStore'
+import { api } from '@/services/restfulAPI'
+import { useAuth } from '@/stores/authStore'
+
+export const useAuthQuery = () => {
+  const { setUser, clearUser, user } = useAuth()
+
+  const query = useQuery({
+    queryKey: ['me'],
+    queryFn: async () => {
+      if (!user) return { user: null }
+      const res = await api.post('/auth/refresh')
+      return res.data
+    },
+    retry: false,
+    staleTime: Infinity,
+  })
+
+  useEffect(() => {
+    if (query.isSuccess && query.data?.user) {
+      setUser(query.data.user as User)
+    }
+  }, [query.isSuccess, query.isError, query.data, setUser, clearUser])
+
+  return query
+}

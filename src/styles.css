@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Orbitron:wght@400..900&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  /* COLORS */
+  --color-page-background: hsl(214, 23%, 94%);
+  --color-active-link: hsl(3, 88%, 64%);
+  --color-link: hsl(0, 0%, 27%);
+  --color-info-bg: hsl(220, 50%, 98%);
+  --color-info-text: hsl(215, 56%, 14%);
+  --color-ability-border: hsl(342, 24%, 68%);
+
+  /* STATS */
+  --color-hp: hsl(349, 74%, 50%);
+  --color-attack: hsl(26, 100%, 64%);
+  --color-defense: hsl(47, 100%, 65%);
+  --color-special-attack: hsl(196, 98%, 76%);
+  --color-special-defense: hsl(99, 78%, 73%);
+  --color-speed: hsl(348, 100%, 78%);
+
+  /* POKEMON TYPE COLORS */
+  --color-type-normal: hsl(45, 20%, 75%);
+  --color-type-fire: hsl(6, 90%, 60%);
+  --color-type-water: hsl(200, 70%, 50%);
+  --color-type-electric: hsl(50, 100%, 50%);
+  --color-type-grass: hsl(120, 60%, 50%);
+  --color-type-ice: hsl(180, 50%, 80%);
+  --color-type-fighting: hsl(0, 60%, 45%);
+  --color-type-poison: hsl(280, 50%, 55%);
+  --color-type-ground: hsl(30, 70%, 50%);
+  --color-type-flying: hsl(210, 60%, 70%);
+  --color-type-psychic: hsl(320, 60%, 55%);
+  --color-type-bug: hsl(90, 60%, 45%);
+  --color-type-rock: hsl(25, 30%, 50%);
+  --color-type-ghost: hsl(260, 40%, 35%);
+  --color-type-dragon: hsl(250, 65%, 45%);
+  --color-type-dark: hsl(0, 0%, 20%);
+  --color-type-steel: hsl(210, 10%, 65%);
+  --color-type-fairy: hsl(330, 60%, 85%);
+
+  /* FONTS */
+  --font-inter: 'Inter', sans-serif;
+  --font-orbitron: 'Orbitron', sans-serif;
+  --font-bangers: 'Bangers', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply font-[16px] tracking-wide m-0 font-inter bg-page-background;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    @apply font-bold font-orbitron;
+  }
+
+  button {
+    @apply outline-none cursor-pointer;
+  }
+
+  input {
+    @apply outline-0 border-0;
+  }
+
+  select {
+    @apply border-0 outline-0;
+  }
+}
+
+@layer utilities {
+  @keyframes rotate360 {
+    0% {
+      transform: rotate(0);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-loader {
+    animation: rotate360 1s linear infinite;
+  }
+
+  .animate-pokeball {
+    animation: rotate360 10s linear infinite;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+}

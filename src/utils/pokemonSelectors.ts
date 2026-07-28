@@ -11,11 +11,9 @@ export function filterPokemon(
   },
 ) {
   return pokemon
-    .filter((p) => p.name?.toLowerCase().includes(filters.search.toLowerCase()))
-    .filter((p) => !filters.type || p.types?.includes(filters.type))
-    .filter(
-      (p) => !filters.weakness || p.weaknesses?.includes(filters.weakness),
-    )
-    .filter((p) => !filters.ability || p.abilities?.includes(filters.ability))
-    .sort((a, b) => (filters.sortAsc ? a.id! - b.id! : b.id! - a.id!))
+    .filter((p) => p.name.toLowerCase().includes(filters.search.toLowerCase()))
+    .filter((p) => !filters.type || p.types.includes(filters.type))
+    .filter((p) => !filters.weakness || p.weaknesses.includes(filters.weakness))
+    .filter((p) => !filters.ability || p.abilities.includes(filters.ability))
+    .sort((a, b) => (filters.sortAsc ? a.id - b.id : b.id - a.id))
 }

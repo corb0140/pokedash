@@ -33,6 +33,9 @@ export type PokemonTypeData = {
 
 export const queryClient = new QueryClient()
 
+const BATCH_SIZE = 50
+const INITIAL_POKEMON_COUNT = 151
+
 /**
  * Generate a Pokémon sprite URL without
  * making another API request.
@@ -44,9 +47,7 @@ export function getPokemonImage(id: number) {
 /**
  * Fetch the lightweight Pokémon list.
  *
- * Only one API request is made to retrieve
- * the complete list of Pokémon.
- *
+ * This only makes one API request.
  * No individual Pokémon detail requests
  * are made here.
  */
@@ -66,9 +67,6 @@ export async function fetchPokemonList(): Promise<Array<PokemonListItem>> {
 
 /**
  * Fetch complete data for a single Pokémon.
- *
- * This is used when detailed information about
- * a specific Pokémon is required.
  */
 export async function fetchPokemonById(id: number): Promise<PokemonProps> {
   const [pokemon, species] = await Promise.all([
@@ -123,36 +121,46 @@ export async function fetchPokemonById(id: number): Promise<PokemonProps> {
 }
 
 /**
- * Fetch detailed Pokémon data for a selected range.
+ * Fetch Pokémon in batches.
  *
- * The lightweight Pokémon list is fetched first.
- * Only Pokémon between `from` and `to` are then
- * requested from the API.
- *
- * Pokémon are processed in controlled batches to
- * prevent sending too many requests at once.
+ * The function yields each batch as soon as it finishes,
+ * allowing the UI to progressively display Pokémon.
  */
-export async function fetchPokemonRange(
-  from = 1,
-  to = 1025,
+export async function fetchPokemonBatch(
+  pokemonList: Array<PokemonListItem>,
+  startIndex: number,
+  batchSize: number,
 ): Promise<Array<PokemonProps>> {
+  const batch = pokemonList.slice(startIndex, startIndex + batchSize)
+
+  return Promise.all(batch.map((pokemon) => fetchPokemonById(pokemon.id)))
+}
+
+/**
+ * Fetch the initial 151 Pokémon.
+ *
+ * This should be called first so the UI can display
+ * the original Pokémon while the rest load.
+ */
+export async function fetchInitialPokemon(): Promise<Array<PokemonProps>> {
   const pokemonList = await fetchPokemonList()
 
-  const start = Math.max(1, from)
-  const end = Math.min(to, pokemonList.length)
+  return fetchPokemonBatch(pokemonList, 0, INITIAL_POKEMON_COUNT)
+}
 
-  const selectedPokemon = pokemonList.slice(start - 1, end)
+/**
+ * Fetch the remaining Pokémon after the initial 151.
+ *
+ * This can be called in the background after
+ * the first 151 Pokémon have been displayed.
+ */
+export async function fetchRemainingPokemon(): Promise<Array<PokemonProps>> {
+  const pokemonList = await fetchPokemonList()
 
   const results: Array<PokemonProps> = []
 
-  const BATCH_SIZE = 50
-
-  for (let i = 0; i < selectedPokemon.length; i += BATCH_SIZE) {
-    const batch = selectedPokemon.slice(i, i + BATCH_SIZE)
-
-    const batchResults = await Promise.all(
-      batch.map((pokemon) => fetchPokemonById(pokemon.id)),
-    )
+  for (let i = INITIAL_POKEMON_COUNT; i < pokemonList.length; i += BATCH_SIZE) {
+    const batchResults = await fetchPokemonBatch(pokemonList, i, BATCH_SIZE)
 
     results.push(...batchResults)
   }
@@ -165,8 +173,6 @@ export type PokemonDashboardData = {
   types: Array<string>
   isLegendary: boolean
 }
-
-const DASHBOARD_BATCH_SIZE = 50
 
 export async function fetchPokemonDashboardData(
   from = 1,
@@ -181,8 +187,8 @@ export async function fetchPokemonDashboardData(
 
   const results: Array<PokemonDashboardData> = []
 
-  for (let i = 0; i < selectedPokemon.length; i += DASHBOARD_BATCH_SIZE) {
-    const batch = selectedPokemon.slice(i, i + DASHBOARD_BATCH_SIZE)
+  for (let i = 0; i < selectedPokemon.length; i += BATCH_SIZE) {
+    const batch = selectedPokemon.slice(i, i + BATCH_SIZE)
 
     const batchResults = await Promise.all(
       batch.map(async (pokemon) => {

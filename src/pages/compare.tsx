@@ -53,10 +53,12 @@ export default function ComparePokemon() {
   const { data: pokemonList = [], isLoading: isPokemonListLoading } =
     usePokemonSearchList()
 
-  const formattedPokemonList = pokemonList.map((pokemon) => ({
-    ...pokemon,
-    name: formatPokemonName(pokemon.name),
-  }))
+  const formattedPokemonList = pokemonList
+    .filter((pokemon) => pokemon.id <= 1025)
+    .map((pokemon) => ({
+      ...pokemon,
+      name: formatPokemonName(pokemon.name),
+    }))
 
   /*
    * Detailed data is only fetched after a Pokémon

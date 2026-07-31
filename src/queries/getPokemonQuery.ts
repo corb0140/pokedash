@@ -169,46 +169,124 @@ export async function fetchRemainingPokemon(): Promise<Array<PokemonProps>> {
 }
 
 export type PokemonDashboardData = {
-  id: number
-  types: Array<string>
-  isLegendary: boolean
+  totalPokemon: number
+  legendaryCount: number
+  pokemonByType: Array<{ name: string; value: number }>
+  pokemonByGeneration: Array<{ generation: string; count: number }>
+}
+
+const GENERATION_RANGES = [
+  { gen: 'Gen 1', from: 1, to: 151 },
+  { gen: 'Gen 2', from: 152, to: 251 },
+  { gen: 'Gen 3', from: 252, to: 386 },
+  { gen: 'Gen 4', from: 387, to: 493 },
+  { gen: 'Gen 5', from: 494, to: 649 },
+  { gen: 'Gen 6+', from: 650, to: 1025 },
+]
+
+const POKEMON_TYPE_NAMES = [
+  'normal',
+  'fire',
+  'water',
+  'electric',
+  'grass',
+  'ice',
+  'fighting',
+  'poison',
+  'ground',
+  'flying',
+  'psychic',
+  'bug',
+  'rock',
+  'ghost',
+  'dragon',
+  'dark',
+  'steel',
+  'fairy',
+]
+
+const LEGENDARY_BATCH_SIZE = 100
+
+/**
+ * Count Pokémon per type using the bulk `/type/{name}` endpoint
+ * (18 requests total) instead of fetching every Pokémon's own
+ * detail record (1000+ requests) just to read its type list.
+ */
+async function fetchPokemonByTypeCounts(
+  selectedIds: Set<number>,
+): Promise<Array<{ name: string; value: number }>> {
+  const results = await Promise.all(
+    POKEMON_TYPE_NAMES.map(async (type) => {
+      const typeData = await getPokemonTypeData(type)
+
+      const value = (typeData?.pokemon ?? []).filter(
+        (entry: { pokemon: { url: string } }) => {
+          const id = Number(entry.pokemon.url.split('/').at(-2))
+          return selectedIds.has(id)
+        },
+      ).length
+
+      return { name: type, value }
+    }),
+  )
+
+  return results.filter((entry) => entry.value > 0)
+}
+
+/**
+ * There's no bulk endpoint for legendary status, so this still
+ * needs one species request per Pokémon. Batched in parallel
+ * groups rather than the smaller sequential rounds used elsewhere,
+ * since this no longer has to share a round with a paired detail call.
+ */
+async function fetchLegendaryCount(
+  selectedPokemon: Array<PokemonListItem>,
+): Promise<number> {
+  let legendaryCount = 0
+
+  for (let i = 0; i < selectedPokemon.length; i += LEGENDARY_BATCH_SIZE) {
+    const batch = selectedPokemon.slice(i, i + LEGENDARY_BATCH_SIZE)
+
+    const batchResults = await Promise.all(
+      batch.map((pokemon) => getPokemonSpeciesById(pokemon.id)),
+    )
+
+    legendaryCount += batchResults.filter(
+      (species) => species.is_legendary,
+    ).length
+  }
+
+  return legendaryCount
 }
 
 export async function fetchPokemonDashboardData(
   from = 1,
   to = 1025,
-): Promise<Array<PokemonDashboardData>> {
+): Promise<PokemonDashboardData> {
   const pokemonList = await fetchPokemonList()
 
   const start = Math.max(1, from)
   const end = Math.min(to, pokemonList.length)
 
   const selectedPokemon = pokemonList.slice(start - 1, end)
+  const selectedIds = new Set(selectedPokemon.map((pokemon) => pokemon.id))
 
-  const results: Array<PokemonDashboardData> = []
+  const [pokemonByType, legendaryCount] = await Promise.all([
+    fetchPokemonByTypeCounts(selectedIds),
+    fetchLegendaryCount(selectedPokemon),
+  ])
 
-  for (let i = 0; i < selectedPokemon.length; i += BATCH_SIZE) {
-    const batch = selectedPokemon.slice(i, i + BATCH_SIZE)
+  const pokemonByGeneration = GENERATION_RANGES.map((generation) => ({
+    generation: generation.gen,
+    count: selectedPokemon.filter(
+      (pokemon) => pokemon.id >= generation.from && pokemon.id <= generation.to,
+    ).length,
+  }))
 
-    const batchResults = await Promise.all(
-      batch.map(async (pokemon) => {
-        const [details, species] = await Promise.all([
-          getPokemonById(pokemon.id),
-          getPokemonSpeciesById(pokemon.id),
-        ])
-
-        return {
-          id: pokemon.id,
-          types: details.types.map(
-            (type: { type: { name: string } }) => type.type.name,
-          ),
-          isLegendary: species.is_legendary,
-        }
-      }),
-    )
-
-    results.push(...batchResults)
+  return {
+    totalPokemon: selectedPokemon.length,
+    legendaryCount,
+    pokemonByType,
+    pokemonByGeneration,
   }
-
-  return results
 }

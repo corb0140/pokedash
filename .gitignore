@@ -8,3 +8,7 @@ count.txt
 .tanstack
 .wrangler
 node_modules
+src/services/restfulAPI.ts
+src/queries/useAuth.ts
+src/queries/useAuthQuery.ts
+src/queries/useFavoritesQuery.ts

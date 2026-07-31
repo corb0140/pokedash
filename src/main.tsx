@@ -13,6 +13,7 @@ import { pokedexRoute } from './routes/pokedex.tsx'
 import { compareRoute } from './routes/compare.tsx'
 import { dashboardRoute } from './routes/dashbaord.tsx'
 import { guessPokemonRoute } from './routes/guessing-game.tsx'
+import { teamBuilderRoute } from './routes/team-builder.tsx'
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -21,6 +22,7 @@ const routeTree = rootRoute.addChildren([
   compareRoute,
   dashboardRoute,
   guessPokemonRoute,
+  teamBuilderRoute,
 ])
 
 const router = createRouter({

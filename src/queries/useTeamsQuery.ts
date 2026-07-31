@@ -1,36 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { api } from '../services/restfulAPI'
+import type { Team, TeamMember } from '@/db/teamsRepo'
+import * as teamsRepo from '@/db/teamsRepo'
 
-/* ---------- API CALLS ---------- */
-
-const getTeamsRequest = async () => {
-  const res = await api.get('/teams')
-  return res.data as Array<{
-    id: string
-    name: string
-    pokemon: Array<number>
-  }>
-}
-
-const createTeamRequest = async (payload: {
-  name: string
-  pokemonIds: Array<number>
-}) => {
-  const res = await api.post('/teams', payload)
-  return res.data
-}
-
-const deleteTeamRequest = async (teamId: string) => {
-  const res = await api.delete(`/teams/${teamId}`)
-  return res.data
-}
+export type { Team, TeamMember }
 
 /* ---------- QUERY ---------- */
 
 export const useTeamsQuery = () => {
   return useQuery({
     queryKey: ['teams'],
-    queryFn: getTeamsRequest,
+    queryFn: teamsRepo.getAllTeams,
   })
 }
 
@@ -40,14 +19,15 @@ export const useTeamsMutations = () => {
   const queryClient = useQueryClient()
 
   const createTeam = useMutation({
-    mutationFn: createTeamRequest,
+    mutationFn: (payload: { name: string; pokemon: Array<TeamMember> }) =>
+      teamsRepo.createTeam(payload.name, payload.pokemon),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teams'] })
     },
   })
 
   const deleteTeam = useMutation({
-    mutationFn: deleteTeamRequest,
+    mutationFn: (teamId: string) => teamsRepo.deleteTeam(teamId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teams'] })
     },

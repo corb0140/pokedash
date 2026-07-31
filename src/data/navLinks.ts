@@ -24,4 +24,9 @@ export const navLinks = [
     path: '/dashboard',
     icon: 'arcticons:pokemon-tcg-live',
   },
+  {
+    name: 'Team Builder',
+    path: '/team-builder',
+    icon: 'mynaui:pokeball-solid',
+  },
 ]

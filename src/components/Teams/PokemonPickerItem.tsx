@@ -24,7 +24,7 @@ function PokemonPickerItem({
       {...attributes}
       onClick={() => onSelect(pokemon)}
       disabled={inTeam}
-      className={`aspect-square rounded-lg bg-page-background flex flex-col items-center justify-center gap-1 p-1 text-center cursor-grab touch-none transition-opacity
+      className={`aspect-square rounded-lg bg-page-background flex flex-col items-center justify-center gap-1 p-1 text-center cursor-grab touch-pan-y transition-opacity
         ${inTeam ? 'opacity-30 cursor-not-allowed' : 'hover:opacity-80'}
         ${isDragging ? 'opacity-0' : ''}`}
     >

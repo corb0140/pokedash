@@ -25,7 +25,7 @@ function App() {
                 hover:bg-hp hover:text-white transition-all duration-500 flex items-center
                 hover:rounded-tl-none hover:rounded-br-none hover:scale-105"
               >
-                Open Pokedex
+                Open Pokédex
               </Link>
 
               <Link
